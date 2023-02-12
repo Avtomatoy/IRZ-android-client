@@ -11,6 +11,6 @@ import ru.avtomaton.irz.app.client.api.auth.models.AuthResponse
  */
 interface AuthApi {
 
-    @POST("/authentication/authenticate")
+    @POST("authentication/authenticate")
     fun authenticate(@Body authBody: AuthBody) : Call<AuthResponse>
 }

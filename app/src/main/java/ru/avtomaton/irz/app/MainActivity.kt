@@ -14,9 +14,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val irzClient = IrzClient(
-            "https://10.0.2.2:7116/api/",
+            "http://10.0.2.2:5249/api/",
             CredentialsHolder("user@example.com", "string")
         )
-        irzClient.authenticate()
     }
 }
