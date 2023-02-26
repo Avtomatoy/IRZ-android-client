@@ -9,6 +9,11 @@ import android.widget.Toast
 import ru.avtomaton.irz.app.activity.AuthActivity
 
 /**
+ * Задачи:
+ * 1) начать хранить креды, подгружать их после перезапуска приложения;
+ * 2) сохранять токены при авторизации;
+ * 3) ...
+ *
  * @author Anton Akkuzin
  */
 class MainActivity : AppCompatActivity() {

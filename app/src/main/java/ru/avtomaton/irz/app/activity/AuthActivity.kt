@@ -78,6 +78,7 @@ class AuthActivity : AppCompatActivity() {
                 this@AuthActivity,
                 "Нет связи с сервером!",
                 Toast.LENGTH_SHORT).show()
+            Log.e(tag, "Error: ", t)
         }
 
     }
