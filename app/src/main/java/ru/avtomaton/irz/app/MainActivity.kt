@@ -1,17 +1,19 @@
 package ru.avtomaton.irz.app
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
-import android.widget.Toast
 import ru.avtomaton.irz.app.activity.AuthActivity
+import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
+import ru.avtomaton.irz.app.infra.SessionManager
+import java.util.Objects
 
 /**
  * Задачи:
- * 1) начать хранить креды, подгружать их после перезапуска приложения;
- * 2) сохранять токены при авторизации;
+ * 1) начать хранить креды, подгружать их после перезапуска приложения (shared preferences);
+ * -2) сохранять токены при авторизации;
  * 3) ...
  *
  * @author Anton Akkuzin
@@ -22,20 +24,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.auth_btn).setOnClickListener {
-            Log.i(tag, "Auth btn pressed")
-            Toast.makeText(this, "Переходим к авторизации...", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, AuthActivity::class.java))
+        if (!SessionManager.isCredentialsLoaded()) {
+            SessionManager.setCredentials(loadCredentials())
+            SessionManager.markCredentialsLoaded()
         }
 
-        Log.i(tag, "onCreate()")
+        if (Objects.isNull(SessionManager.getCredentials())) {
+            setContentView(R.layout.activity_main)
+        } else {
+            // другая полная вьюха со всеми кнопками
+        }
+
+        findViewById<Button>(R.id.auth_btn).setOnClickListener {
+            startActivity(Intent(this, AuthActivity::class.java))
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.i(tag, "onResume()")
+    fun loadCredentials() : AuthBody? {
+        TODO()
     }
-
 }

@@ -5,4 +5,6 @@
     <string name="auth_textview_message">Вход</string>
     <string name="auth_email_hint">petrov@irz.ru</string>
     <string name="auth_password_hint">Пароль</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
 </resources>

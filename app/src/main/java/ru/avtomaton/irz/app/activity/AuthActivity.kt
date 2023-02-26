@@ -1,13 +1,16 @@
 package ru.avtomaton.irz.app.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import retrofit2.Call
 import retrofit2.Response
+import ru.avtomaton.irz.app.MainActivity
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
@@ -31,6 +34,7 @@ class AuthActivity : AppCompatActivity() {
         passwordField = findViewById(R.id.auth_password)
 
         findViewById<Button>(R.id.auth_request_btn).setOnClickListener { auth() }
+        onBackPressedDispatcher.addCallback(BackPressedCallback())
     }
 
     private fun auth() {
@@ -51,17 +55,17 @@ class AuthActivity : AppCompatActivity() {
             return
         }
 
-        IrzClient.authApi.authenticate(AuthBody(email, password)).enqueue(Callback())
+        IrzClient.authApi.authenticate(AuthBody(email, password)).enqueue(AuthCallback())
     }
 
-    inner class Callback : retrofit2.Callback<JwtTokens> {
+    inner class AuthCallback : retrofit2.Callback<JwtTokens> {
         override fun onResponse(call: Call<JwtTokens>, response: Response<JwtTokens>) {
             if (response.isSuccessful) {
                 val jwtToken = response.body()?.jwtToken
                 val refreshToken = response.body()?.refreshToken
                 Log.i(tag, "Successfully authenticated!")
                 Log.i(tag, "tokens are jwt=[${jwtToken}], refresh=[${refreshToken}].")
-                finish()
+                startActivity(Intent(this@AuthActivity, MainActivity::class.java))
             } else {
                 Toast.makeText(
                     this@AuthActivity,
@@ -79,6 +83,12 @@ class AuthActivity : AppCompatActivity() {
                 "Нет связи с сервером!",
                 Toast.LENGTH_SHORT).show()
             Log.e(tag, "Error: ", t)
+        }
+    }
+
+    inner class BackPressedCallback : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            startActivity(Intent(this@AuthActivity, MainActivity::class.java))
         }
 
     }

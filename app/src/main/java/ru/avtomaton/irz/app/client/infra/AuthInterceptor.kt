@@ -41,6 +41,8 @@ class AuthInterceptor : Interceptor {
             val reAuthResponse = interceptAuth(chain, authReq!!)
             if (reAuthResponse.isSuccessful) {
                 return chain.proceed(insertBearerHeader(chain.request()))
+            } else {
+                authRequest.compareAndSet(authRequest.get(), null)
             }
         }
         return response
