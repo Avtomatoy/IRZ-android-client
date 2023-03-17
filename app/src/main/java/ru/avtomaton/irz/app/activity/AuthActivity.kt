@@ -8,13 +8,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import retrofit2.Call
-import retrofit2.Response
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.MainActivity
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
-import ru.avtomaton.irz.app.client.api.auth.models.JwtTokens
+import ru.avtomaton.irz.app.infra.SessionManager
+import java.util.Objects
 
 /**
  * @author Anton Akkuzin
@@ -23,8 +24,12 @@ class AuthActivity : AppCompatActivity() {
 
     private val tag : String = "[Auth]"
 
-    private var emailField : EditText? = null
-    private var passwordField : EditText? = null
+    private lateinit var emailField : EditText
+    private lateinit var passwordField : EditText
+    private lateinit var button : Button
+
+    private lateinit var awaitMessage : String
+    private lateinit var authBtnMessage : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,12 +38,22 @@ class AuthActivity : AppCompatActivity() {
         emailField = findViewById(R.id.auth_email)
         passwordField = findViewById(R.id.auth_password)
 
-        findViewById<Button>(R.id.auth_request_btn).setOnClickListener { auth() }
+        val credentials = SessionManager.getCredentials()
+        if (Objects.nonNull(credentials)) {
+            emailField.setText(credentials!!.email)
+            passwordField.setText(credentials.password)
+        }
+
+        button = findViewById(R.id.auth_request_btn)
+        awaitMessage = getString(R.string.auth_btn_await_message)
+        authBtnMessage = getString(R.string.auth_btn_message)
+
+        button.setOnClickListener { auth() }
         onBackPressedDispatcher.addCallback(BackPressedCallback())
     }
 
     private fun auth() {
-        val email = emailField!!.text.toString()
+        val email = emailField.text.toString()
         if (email.isEmpty()) {
             Toast.makeText(
                 this,
@@ -46,7 +61,7 @@ class AuthActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT).show()
             return
         }
-        val password = passwordField!!.text.toString()
+        val password = passwordField.text.toString()
         if (password.isEmpty()) {
             Toast.makeText(
                 this,
@@ -54,42 +69,52 @@ class AuthActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT).show()
             return
         }
-
-        IrzClient.authApi.authenticate(AuthBody(email, password)).enqueue(AuthCallback())
+        this.lifecycleScope.launch {
+            button.text = awaitMessage
+            val authBody = AuthBody(email, password)
+            val result = AuthRepository.auth(authBody)
+            if (result.isFailure) {
+                onAuthError(result.exceptionOrNull()!!)
+            }
+            if (result.isSuccess) {
+                if (result.getOrNull()!!) {
+                    SessionManager.setCredentials(authBody)
+                    onAuthSuccess()
+                } else {
+                    onAuthFailure()
+                }
+            }
+            button.text = authBtnMessage
+        }
     }
 
-    inner class AuthCallback : retrofit2.Callback<JwtTokens> {
-        override fun onResponse(call: Call<JwtTokens>, response: Response<JwtTokens>) {
-            if (response.isSuccessful) {
-                val jwtToken = response.body()?.jwtToken
-                val refreshToken = response.body()?.refreshToken
-                Log.i(tag, "Successfully authenticated!")
-                Log.i(tag, "tokens are jwt=[${jwtToken}], refresh=[${refreshToken}].")
-                startActivity(Intent(this@AuthActivity, MainActivity::class.java))
-            } else {
-                Toast.makeText(
-                    this@AuthActivity,
-                    "Мы Вас не узанали, попробуйте ещё раз!",
-                    Toast.LENGTH_SHORT).show()
-                val code = response.code()
-                val body = response.body().toString()
-                Log.w(tag, "Auth failed with code=${code}, body=${body}.")
-            }
-        }
+    private fun onAuthSuccess() {
+        startActivity(Intent(
+            this@AuthActivity,
+            MainActivity::class.java)
+        )
+    }
 
-        override fun onFailure(call: Call<JwtTokens>, t: Throwable) {
-            Toast.makeText(
-                this@AuthActivity,
-                "Нет связи с сервером!",
-                Toast.LENGTH_SHORT).show()
-            Log.e(tag, "Error: ", t)
-        }
+    private fun onAuthFailure() {
+        Toast.makeText(
+            this@AuthActivity,
+            "Мы Вас не узанали, попробуйте ещё раз!",
+            Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onAuthError(t: Throwable) {
+        Toast.makeText(
+            this@AuthActivity,
+            "Нет связи с сервером!",
+            Toast.LENGTH_SHORT).show()
+        Log.e(tag, "Error: ", t)
     }
 
     inner class BackPressedCallback : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+            startActivity(
+                Intent(this@AuthActivity, NewsActivity::class.java)
+            )
         }
-
     }
 }

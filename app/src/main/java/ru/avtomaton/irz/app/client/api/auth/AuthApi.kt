@@ -1,6 +1,7 @@
 package ru.avtomaton.irz.app.client.api.auth
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -17,7 +18,7 @@ import ru.avtomaton.irz.app.client.authentication_refresh
 interface AuthApi {
 
     @POST(authentication_authenticate)
-    fun authenticate(@Body authBody: AuthBody) : Call<JwtTokens>
+    suspend fun authenticate(@Body authBody: AuthBody) : Response<JwtTokens>
 
     @POST(authentication_refresh)
     fun refresh(@Body jwtTokens: JwtTokens) : Call<JwtTokens>

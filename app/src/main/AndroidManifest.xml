@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.NewsActivity" />
         <activity android:name=".activity.AuthActivity" />
     </application>
 

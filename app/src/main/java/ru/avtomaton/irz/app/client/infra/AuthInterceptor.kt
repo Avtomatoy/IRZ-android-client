@@ -58,10 +58,10 @@ class AuthInterceptor : Interceptor {
     private fun interceptAuth(chain: Interceptor.Chain, request: Request) : Response {
         val response = chain.proceed(request)
         if (response.isSuccessful) {
-            authRequest.compareAndSet(this.authRequest.get(), response.request())
+            authRequest.set(response.request())
 
             val newJwtTokens = gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), JwtTokens::class.java)
-            jwtTokens.compareAndSet(this.jwtTokens.get(), newJwtTokens)
+            jwtTokens.set(newJwtTokens)
         }
         return response
     }

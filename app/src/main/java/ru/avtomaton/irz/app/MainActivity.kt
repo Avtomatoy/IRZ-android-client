@@ -4,44 +4,45 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import ru.avtomaton.irz.app.activity.AuthActivity
-import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import ru.avtomaton.irz.app.activity.NewsActivity
 import ru.avtomaton.irz.app.infra.SessionManager
-import java.util.Objects
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /**
  * Задачи:
  * 1) начать хранить креды, подгружать их после перезапуска приложения (shared preferences);
  * -2) сохранять токены при авторизации;
- * 3) ...
+ * 3) личный кабинет со всем функционалом;
+ *  а) ...
+ *  б) ...
+ * 4) Cabinets api
+ * 5) Events api
+ * 6) Новости
+ *  а) комментарии
+ *  б) лайки
+ *
  *
  * @author Anton Akkuzin
  */
 class MainActivity : AppCompatActivity() {
 
-    private val tag : String = "[Main]"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (!SessionManager.isCredentialsLoaded()) {
-            SessionManager.setCredentials(loadCredentials())
-            SessionManager.markCredentialsLoaded()
-        }
-
-        if (Objects.isNull(SessionManager.getCredentials())) {
-            setContentView(R.layout.activity_main)
-        } else {
-            // другая полная вьюха со всеми кнопками
-        }
-
-        findViewById<Button>(R.id.auth_btn).setOnClickListener {
-            startActivity(Intent(this, AuthActivity::class.java))
+        setContentView(R.layout.activity_main)
+        SessionManager.init(dataStore)
+        this.lifecycleScope.launch {
+            SessionManager.login()
+            startNews()
         }
     }
 
-    fun loadCredentials() : AuthBody? {
-        TODO()
+    private fun startNews() {
+        startActivity(Intent(this, NewsActivity::class.java))
     }
 }
