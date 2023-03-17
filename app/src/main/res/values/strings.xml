@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">IRZ Android-client</string>
+    <string name="welcome_message">Добро пожаловать в ЕЦК ИРЗ!</string>
+    <string name="auth_btn_message">Войти</string>
+    <string name="auth_btn_await_message">Секундочку</string>
+    <string name="auth_textview_message">Вход</string>
+    <string name="auth_email_hint">petrov@irz.ru</string>
+    <string name="auth_password_hint">Пароль</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="main_logo">ЕЦК ИРЗ</string>
+</resources>
