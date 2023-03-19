@@ -9,12 +9,16 @@ android {
 
     defaultConfig {
         applicationId "ru.avtomaton.irz.app"
-        minSdk 22
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -39,9 +43,12 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0'
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation 'com.google.android.material:material:1.8.0'
 
     // http client
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

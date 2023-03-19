@@ -7,4 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!--  irz colors  -->
+    <color name="Pantone_295_C">#002856</color>
+    <color name="Pantone_289_C">#1F3A60</color>
+
+    <color name="Cool_Grey_1">#EDEDED</color>
+    <color name="Cool_Grey_3">#E0E0E0</color>
+
+    <color name="Pantone_200_C">#C31727</color>
+    <color name="Pantone_187_C">#AE1926</color>
 </resources>

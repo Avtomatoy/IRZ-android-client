@@ -29,10 +29,9 @@ object SessionManager {
         val preferences = dataStore.data.first()
         val email = preferences[email]
         val password = preferences[password]
-        if (Objects.isNull(email) || Objects.isNull(password)) {
-            return false
-        }
-        val authBody = AuthBody(email!!, password!!)
+        email ?: return false
+        password ?: return false
+        val authBody = AuthBody(email, password)
         credentials.set(authBody)
         val result = AuthRepository.auth(authBody)
 

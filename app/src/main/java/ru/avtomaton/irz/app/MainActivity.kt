@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import ru.avtomaton.irz.app.activity.NewsActivity
+import ru.avtomaton.irz.app.activity.news.NewsActivity
 import ru.avtomaton.irz.app.infra.SessionManager
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")

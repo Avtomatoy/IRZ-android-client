@@ -16,7 +16,7 @@ const val HTTP_UNAUTHORIZED = 401
  */
 class AuthInterceptor : Interceptor {
 
-    private val gson : Gson = Gson()
+    private val gson: Gson = Gson()
 
     private val authRequest: AtomicReference<Request?> =
         AtomicReference(null)
@@ -32,35 +32,29 @@ class AuthInterceptor : Interceptor {
 
         val response = chain.proceed(request)
         if (response.code() == HTTP_UNAUTHORIZED) {
-            println("UNAUTHORIZED")
-            val authReq = authRequest.get()
-            if (Objects.isNull(authReq)) {
-                return response
-            }
-            println("Making re-auth request...")
-            val reAuthResponse = interceptAuth(chain, authReq!!)
+            val authReq = authRequest.get() ?: return response
+            val reAuthResponse = interceptAuth(chain, authReq)
             if (reAuthResponse.isSuccessful) {
                 return chain.proceed(insertBearerHeader(chain.request()))
-            } else {
-                authRequest.compareAndSet(authRequest.get(), null)
             }
+            authRequest.set(null)
         }
         return response
     }
 
-    private fun insertBearerHeader(request: Request) : Request {
+    private fun insertBearerHeader(request: Request): Request {
         return request
             .newBuilder()
             .addHeader("Authorization", "Bearer ${jwtTokens.get().jwtToken}")
             .build()
     }
 
-    private fun interceptAuth(chain: Interceptor.Chain, request: Request) : Response {
+    private fun interceptAuth(chain: Interceptor.Chain, request: Request): Response {
         val response = chain.proceed(request)
         if (response.isSuccessful) {
             authRequest.set(response.request())
-
-            val newJwtTokens = gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), JwtTokens::class.java)
+            val newJwtTokens =
+                gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), JwtTokens::class.java)
             jwtTokens.set(newJwtTokens)
         }
         return response
