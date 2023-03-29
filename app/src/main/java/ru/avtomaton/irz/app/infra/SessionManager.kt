@@ -22,6 +22,7 @@ object SessionManager {
     private var initialized : Boolean = false
     private lateinit var dataStore: DataStore<Preferences>
 
+
     suspend fun login() : Boolean {
         if (!initialized) {
             throw java.lang.IllegalStateException("not initialized")
@@ -38,6 +39,17 @@ object SessionManager {
         return result.isSuccess && result.getOrNull()!!
     }
 
+    suspend fun meInfo() {
+        // TODO:  
+        if (!initialized) {
+            throw java.lang.IllegalStateException("not initialized")
+        }
+        if (!authenticated()) {
+            return
+        }
+
+    }
+
     fun init(dataStore: DataStore<Preferences>) {
         this.dataStore = dataStore
         initialized = true
@@ -51,11 +63,16 @@ object SessionManager {
         }
     }
 
+    suspend fun dropCredentials() {
+        credentials.set(null)
+        dataStore.edit { it.clear() }
+    }
+
     fun getCredentials() : AuthBody? {
         return credentials.get()
     }
 
     fun authenticated() : Boolean {
-        return Objects.isNull(credentials.get())
+        return credentials.get() != null
     }
 }

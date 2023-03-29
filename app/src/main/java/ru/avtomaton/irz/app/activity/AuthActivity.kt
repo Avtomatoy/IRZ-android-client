@@ -12,11 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.MainActivity
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.activity.news.NewsActivity
 import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
 import ru.avtomaton.irz.app.infra.SessionManager
-import java.util.Objects
 
 /**
  * @author Anton Akkuzin
@@ -38,12 +36,6 @@ class AuthActivity : AppCompatActivity() {
 
         emailField = findViewById(R.id.auth_email)
         passwordField = findViewById(R.id.auth_password)
-
-        val credentials = SessionManager.getCredentials()
-        credentials?.also {
-            emailField.setText(it.email)
-            passwordField.setText(it.password)
-        }
 
         button = findViewById(R.id.auth_request_btn)
         awaitMessage = getString(R.string.auth_btn_await_message)

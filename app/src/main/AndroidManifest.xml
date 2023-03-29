@@ -21,8 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.news.NewsActivity" />
+        <activity android:name=".activity.NewsActivity" />
         <activity android:name=".activity.AuthActivity" />
+        <activity android:name=".activity.ProfileActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

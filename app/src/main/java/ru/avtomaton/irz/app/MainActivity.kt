@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import ru.avtomaton.irz.app.activity.news.NewsActivity
+import ru.avtomaton.irz.app.activity.NewsActivity
 import ru.avtomaton.irz.app.infra.SessionManager
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -37,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         SessionManager.init(dataStore)
         this.lifecycleScope.launch {
-            SessionManager.login()
+            val login = SessionManager.login()
+            println("login result = $login")
             startNews()
         }
     }

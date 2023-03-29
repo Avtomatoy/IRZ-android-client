@@ -10,6 +10,14 @@
     <string name="password">password</string>
     <string name="main_logo">ЕЦК ИРЗ</string>
 
+    <string name="news_button_description">Кнопка Новости</string>
+    <string name="message_button_description">Кнопка Сообщения</string>
+    <string name="search_button_description">Кнопка Поиск</string>
+    <string name="calendar_button_description">Кнопка События</string>
+    <string name="profile_button_description">Кнопка Личный кабинет</string>
+    <string name="like_button_description">Кнопка лайка</string>
+    <string name="comment_button_description">Кнопка комментариев</string>
+
     <string name="news_name">Новости</string>
     <string name="news_title_placeholder">Название новости</string>
     <string name="news_author_name_placeholder">Нечаев Сергей</string>
@@ -17,4 +25,5 @@
     <string name="news_text_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
     <string name="news_datetime_placeholder">24.02.2022, 13:37</string>
     <string name="news_image_description">Картинка</string>
+
 </resources>

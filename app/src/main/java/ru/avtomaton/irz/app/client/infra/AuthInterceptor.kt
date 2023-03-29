@@ -6,7 +6,7 @@ import okhttp3.Request
 import okhttp3.Response
 import ru.avtomaton.irz.app.client.api.auth.models.JwtTokens
 import ru.avtomaton.irz.app.client.authentication_authenticate
-import java.util.Objects
+import ru.avtomaton.irz.app.infra.SessionManager
 import java.util.concurrent.atomic.AtomicReference
 
 const val HTTP_UNAUTHORIZED = 401
@@ -28,7 +28,9 @@ class AuthInterceptor : Interceptor {
         if (isAuthRequest(chain)) {
             return interceptAuth(chain, chain.request())
         }
-        val request = insertBearerHeader(chain.request())
+        val request = if (SessionManager.authenticated())
+            insertBearerHeader(chain.request())
+        else chain.request()
 
         val response = chain.proceed(request)
         if (response.code() == HTTP_UNAUTHORIZED) {

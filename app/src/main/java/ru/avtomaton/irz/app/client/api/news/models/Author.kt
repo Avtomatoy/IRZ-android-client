@@ -10,6 +10,6 @@ data class Author(
     val id: UUID,
     val firstName: String,
     val surname: String,
-    val patronymic: String,
+    val patronymic: String?,
     val image: Bitmap?
 )

@@ -1,8 +1,10 @@
 package ru.avtomaton.irz.app.client.api.users
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
-import ru.avtomaton.irz.app.client.api.users.models.MeResponse
+import retrofit2.http.Path
+import ru.avtomaton.irz.app.client.api.users.models.UserDto
+import java.util.UUID
 
 /**
  * @author Anton Akkuzin
@@ -10,5 +12,8 @@ import ru.avtomaton.irz.app.client.api.users.models.MeResponse
 interface UsersApi {
 
     @GET("users/me")
-    fun me() : Call<MeResponse>
+    suspend fun me() : Response<UserDto>
+
+    @GET("users/{id}")
+    suspend fun user(@Path("id") id: UUID) : Response<UserDto>
 }

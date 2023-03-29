@@ -7,6 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import ru.avtomaton.irz.app.client.api.auth.AuthApi
 import ru.avtomaton.irz.app.client.api.images.ImagesApi
+import ru.avtomaton.irz.app.client.api.likes.LikesApi
 import ru.avtomaton.irz.app.client.api.news.NewsApi
 import ru.avtomaton.irz.app.client.api.users.UsersApi
 import ru.avtomaton.irz.app.client.infra.AuthInterceptor
@@ -19,6 +20,7 @@ object IrzClient {
     val usersApi: UsersApi
     val newsApi: NewsApi
     val imagesApi: ImagesApi
+    val likesApi: LikesApi
 
     init {
         val okHttpClient = OkHttpClient.Builder()
@@ -35,5 +37,6 @@ object IrzClient {
         usersApi = retrofit.create(UsersApi::class.java)
         newsApi = retrofit.create(NewsApi::class.java)
         imagesApi = retrofit.create(ImagesApi::class.java)
+        likesApi = retrofit.create(LikesApi::class.java)
     }
 }

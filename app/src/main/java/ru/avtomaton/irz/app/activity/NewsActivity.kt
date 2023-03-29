@@ -1,20 +1,30 @@
-package ru.avtomaton.irz.app.activity.news
+package ru.avtomaton.irz.app.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.launch
-import ru.avtomaton.irz.app.activity.news.util.NewsFeedAdapter
+import ru.avtomaton.irz.app.R
+import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
+import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.news.NewsRepository
 import ru.avtomaton.irz.app.databinding.ActivityNewsBinding
+import ru.avtomaton.irz.app.infra.SessionManager
+import java.util.*
 
 /**
  * @author Anton Akkuzin
  */
-class NewsActivity : AppCompatActivity(), NewsFeedAdapter.Updater, SwipeRefreshLayout.OnRefreshListener {
+class NewsActivity :
+    AppCompatActivity(),
+    NewsFeedAdapter.Updater,
+    NewsFeedAdapter.LikeListener,
+    SwipeRefreshLayout.OnRefreshListener {
 
     private val pageSize = 10
 
@@ -30,6 +40,21 @@ class NewsActivity : AppCompatActivity(), NewsFeedAdapter.Updater, SwipeRefreshL
         newsRefreshLayout = binding.newsRefreshLayout
         newsRefreshLayout.setOnRefreshListener(this)
         binding.newsName.setOnClickListener { scrollToActivityTop() }
+        binding.newsButton.setOnClickListener { scrollToActivityTop() }
+
+        if (SessionManager.authenticated()) {
+            binding.profileButton.setOnClickListener {
+                startActivity(Intent(this, ProfileActivity::class.java))
+            }
+        } else {
+            binding.profileButton.setOnClickListener {
+                startActivity(Intent(this, AuthActivity::class.java))
+            }
+            val colorStateList = ContextCompat.getColorStateList(this, R.color.Cool_Grey_3)
+            binding.messagesButton.backgroundTintList = colorStateList
+            binding.searchButton.backgroundTintList = colorStateList
+            binding.calendarButton.backgroundTintList = colorStateList
+        }
         onBackPressedDispatcher.addCallback(DoNothingBackPressedCallback())
         setupAdapter()
         setContentView(binding.root)
@@ -40,7 +65,7 @@ class NewsActivity : AppCompatActivity(), NewsFeedAdapter.Updater, SwipeRefreshL
     }
 
     private fun setupAdapter() {
-        newsFeedAdapter = NewsFeedAdapter(this)
+        newsFeedAdapter = NewsFeedAdapter(this, this)
         this.lifecycleScope.launch { updateNews(0, pageSize) }
         binding.newsFeed.apply {
             layoutManager = LinearLayoutManager(this@NewsActivity)
@@ -65,5 +90,25 @@ class NewsActivity : AppCompatActivity(), NewsFeedAdapter.Updater, SwipeRefreshL
     override fun onRefresh() {
         setupAdapter()
         newsRefreshLayout.isRefreshing = false
+    }
+
+    override fun onLike(newsId: UUID) {
+        this.lifecycleScope.launch {
+            try {
+                IrzClient.likesApi.like(newsId)
+            } catch (ex: Throwable) {
+                // ignore
+            }
+        }
+    }
+
+    override fun onDislike(newsId: UUID) {
+        this.lifecycleScope.launch {
+            try {
+                IrzClient.likesApi.dislike(newsId)
+            } catch (ex: Throwable) {
+                // ignore
+            }
+        }
     }
 }
