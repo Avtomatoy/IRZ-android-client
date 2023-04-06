@@ -6,6 +6,7 @@ import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.images.ImageRepository
 import ru.avtomaton.irz.app.client.api.users.models.User
 import ru.avtomaton.irz.app.client.api.users.models.UserDto
+import ru.avtomaton.irz.app.client.api.users.models.UserRoles
 import java.util.UUID
 
 /**
@@ -61,7 +62,18 @@ class UserRepository {
             userDto.subscriptionsCount,
             userDto.isSubscription,
             userDto.email,
-            userDto.isActiveAccount
+            userDto.isActiveAccount,
+            roles(userDto)
         )
+    }
+
+    private fun roles(userDto: UserDto): List<String> {
+        val result = mutableListOf<String>()
+        userDto.roles.forEach {
+            if (UserRoles.containsRole(it)) {
+                result.add(it)
+            }
+        }
+        return result
     }
 }

@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
-import java.util.Objects
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -36,18 +35,11 @@ object SessionManager {
         credentials.set(authBody)
         val result = AuthRepository.auth(authBody)
 
-        return result.isSuccess && result.getOrNull()!!
-    }
-
-    suspend fun meInfo() {
-        // TODO:  
-        if (!initialized) {
-            throw java.lang.IllegalStateException("not initialized")
+        val authenticated = result.isSuccess && result.getOrNull()!!
+        if (!authenticated) {
+            dropCredentials()
         }
-        if (!authenticated()) {
-            return
-        }
-
+        return authenticated
     }
 
     fun init(dataStore: DataStore<Preferences>) {

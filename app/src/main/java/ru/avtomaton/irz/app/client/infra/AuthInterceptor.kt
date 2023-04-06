@@ -53,6 +53,7 @@ class AuthInterceptor : Interceptor {
 
     private fun interceptAuth(chain: Interceptor.Chain, request: Request): Response {
         val response = chain.proceed(request)
+
         if (response.isSuccessful) {
             authRequest.set(response.request())
             val newJwtTokens =

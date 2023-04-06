@@ -17,6 +17,7 @@
     <string name="profile_button_description">Кнопка Личный кабинет</string>
     <string name="like_button_description">Кнопка лайка</string>
     <string name="comment_button_description">Кнопка комментариев</string>
+    <string name="write_news_button_description">Кнопка написания новости</string>
 
     <string name="news_name">Новости</string>
     <string name="news_title_placeholder">Название новости</string>
@@ -25,5 +26,11 @@
     <string name="news_text_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
     <string name="news_datetime_placeholder">24.02.2022, 13:37</string>
     <string name="news_image_description">Картинка</string>
+    <string name="add_image_text">Добавить изображение</string>
+    <string name="remove_image_text">Убрать изображение</string>
+    <string name="post_news_button">Опубликовать</string>
+    <string name="public_news_switch">Публичная новость? </string>
+    <string name="enable_public_news">Да</string>
+    <string name="disable_public_news">Нет</string>
 
 </resources>

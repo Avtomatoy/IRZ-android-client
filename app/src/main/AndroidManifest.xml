@@ -24,6 +24,8 @@
         <activity android:name=".activity.NewsActivity" />
         <activity android:name=".activity.AuthActivity" />
         <activity android:name=".activity.ProfileActivity" />
+        <activity android:name=".activity.CurrentNewsItemActivity" />
+        <activity android:name=".activity.PostNewsActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

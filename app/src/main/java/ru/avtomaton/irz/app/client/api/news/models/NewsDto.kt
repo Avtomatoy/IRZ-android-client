@@ -16,5 +16,6 @@ data class NewsDto(
     @SerializedName("isLiked") val isLiked: Boolean,
     @SerializedName("likesCount") val likesCount: Int,
     @SerializedName("author") val authorDto: AuthorDto,
-    @SerializedName("commentCount") val commentCount: Int
+    @SerializedName("commentCount") val commentCount: Int,
+    @SerializedName("isClipped") val isClipped: Boolean
 )

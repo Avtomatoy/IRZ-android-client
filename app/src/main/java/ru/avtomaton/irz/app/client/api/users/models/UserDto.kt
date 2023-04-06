@@ -22,6 +22,6 @@ data class UserDto(
     @SerializedName("isSubscription") val isSubscription: Boolean,
     @SerializedName("email") val email: String,
     @SerializedName("isActiveAccount") val isActiveAccount: Boolean,
-    // TODO: roles
+    @SerializedName("roles") val roles: List<String>,
     // TODO: positions
 )

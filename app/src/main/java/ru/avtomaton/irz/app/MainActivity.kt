@@ -11,10 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.activity.NewsActivity
 import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.infra.UserManager
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /**
+ * 1Az$dsdwdadqwdqds
  * Задачи:
  * 1) начать хранить креды, подгружать их после перезапуска приложения (shared preferences);
  * -2) сохранять токены при авторизации;
@@ -39,6 +41,9 @@ class MainActivity : AppCompatActivity() {
         this.lifecycleScope.launch {
             val login = SessionManager.login()
             println("login result = $login")
+            if (login) {
+                UserManager.downloadInfo()
+            }
             startNews()
         }
     }

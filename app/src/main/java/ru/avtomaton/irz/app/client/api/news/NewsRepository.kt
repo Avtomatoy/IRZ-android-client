@@ -1,12 +1,14 @@
 package ru.avtomaton.irz.app.client.api.news
 
 import android.graphics.Bitmap
+import okhttp3.ResponseBody
 import retrofit2.Response
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.images.ImageRepository
 import ru.avtomaton.irz.app.client.api.news.models.Author
 import ru.avtomaton.irz.app.client.api.news.models.News
 import ru.avtomaton.irz.app.client.api.news.models.NewsDto
+import java.util.UUID
 
 /**
  * @author Anton Akkuzin
@@ -14,6 +16,35 @@ import ru.avtomaton.irz.app.client.api.news.models.NewsDto
 class NewsRepository {
 
     private val imageRepository: ImageRepository = ImageRepository()
+
+    private suspend fun getNewsFullText(id: UUID): String {
+        val response: Response<ResponseBody>
+        try {
+            response = IrzClient.newsApi.getNewsFullText(id)
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            return ""
+        }
+        if (!response.isSuccessful) {
+            return ""
+        }
+        return response.body()!!.string()
+    }
+
+    suspend fun getNewsWithFullText(news: News): News {
+        val text = getNewsFullText(news.id)
+        return News(
+            news.id,
+            news.title,
+            text,
+            news.image,
+            news.dateTime,
+            news.isLiked,
+            news.likesCount,
+            news.author,
+            news.commentCount
+        )
+    }
 
     suspend fun getNews(pageIndex: Int, pageSize: Int): MutableList<News>? {
         val response: Response<List<NewsDto>>
@@ -40,11 +71,12 @@ class NewsRepository {
         return result
     }
 
+
     private fun convertDto(dto: NewsDto, newsImage: Bitmap?, authorImage: Bitmap?): News {
         return News(
             dto.id,
             dto.title,
-            "${dto.text}...",
+            "${dto.text}${if (dto.isClipped) "..." else ""}",
             newsImage,
             dto.dateTime,
             dto.isLiked,

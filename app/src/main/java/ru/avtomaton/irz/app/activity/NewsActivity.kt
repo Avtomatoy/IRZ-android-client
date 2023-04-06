@@ -2,6 +2,7 @@ package ru.avtomaton.irz.app.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -13,6 +14,7 @@ import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.news.NewsRepository
+import ru.avtomaton.irz.app.client.api.news.models.News
 import ru.avtomaton.irz.app.databinding.ActivityNewsBinding
 import ru.avtomaton.irz.app.infra.SessionManager
 import java.util.*
@@ -22,11 +24,11 @@ import java.util.*
  */
 class NewsActivity :
     AppCompatActivity(),
-    NewsFeedAdapter.Updater,
-    NewsFeedAdapter.LikeListener,
+    NewsFeedAdapter.NewsFeedAdapterListener,
     SwipeRefreshLayout.OnRefreshListener {
 
     private val pageSize = 10
+    private val postRequestCode = 228
 
     private val newsRepository: NewsRepository = NewsRepository()
 
@@ -41,12 +43,16 @@ class NewsActivity :
         newsRefreshLayout.setOnRefreshListener(this)
         binding.newsName.setOnClickListener { scrollToActivityTop() }
         binding.newsButton.setOnClickListener { scrollToActivityTop() }
+        binding.writeNewsButton.setOnClickListener {
+            startActivityForResult(Intent(this, PostNewsActivity::class.java), postRequestCode)
+        }
 
         if (SessionManager.authenticated()) {
             binding.profileButton.setOnClickListener {
                 startActivity(Intent(this, ProfileActivity::class.java))
             }
         } else {
+            binding.writeNewsButton.visibility = View.GONE
             binding.profileButton.setOnClickListener {
                 startActivity(Intent(this, AuthActivity::class.java))
             }
@@ -65,7 +71,7 @@ class NewsActivity :
     }
 
     private fun setupAdapter() {
-        newsFeedAdapter = NewsFeedAdapter(this, this)
+        newsFeedAdapter = NewsFeedAdapter(this)
         this.lifecycleScope.launch { updateNews(0, pageSize) }
         binding.newsFeed.apply {
             layoutManager = LinearLayoutManager(this@NewsActivity)
@@ -109,6 +115,27 @@ class NewsActivity :
             } catch (ex: Throwable) {
                 // ignore
             }
+        }
+    }
+
+    override fun onNewsClick(news: News) {
+        this.lifecycleScope.launch {
+            val newsWithFullText = newsRepository.getNewsWithFullText(news)
+            val intent = Intent(this@NewsActivity, CurrentNewsItemActivity::class.java)
+            intent.putExtra(newsItemKey, newsWithFullText)
+            CurrentNewsItemActivity.image = newsWithFullText.image
+            CurrentNewsItemActivity.authorImage = newsWithFullText.author.image
+            startActivity(intent)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        println("check")
+        println("result=$resultCode,request=$requestCode")
+        if (resultCode == RESULT_OK && requestCode == postRequestCode) {
+            print("update")
+            setupAdapter()
         }
     }
 }

@@ -15,6 +15,7 @@ import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
 import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.infra.UserManager
 
 /**
  * @author Anton Akkuzin
@@ -72,6 +73,7 @@ class AuthActivity : AppCompatActivity() {
             if (result.isSuccess) {
                 if (result.getOrNull()!!) {
                     SessionManager.setCredentials(authBody)
+                    UserManager.downloadInfo()
                     onAuthSuccess()
                 } else {
                     onAuthFailure()

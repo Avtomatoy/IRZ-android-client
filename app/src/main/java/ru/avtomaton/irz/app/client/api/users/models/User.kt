@@ -21,4 +21,5 @@ data class User(
     val isSubscription: Boolean,
     val email: String,
     val isActiveAccount: Boolean,
+    val roles: List<String>
 )

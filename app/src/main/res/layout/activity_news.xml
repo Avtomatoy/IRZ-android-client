@@ -4,6 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/write_news_button"
+        android:layout_width="56dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/news_refresh_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/white"
+        android:src="@drawable/plus"
+        android:backgroundTint="@color/Pantone_289_C"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:contentDescription="@string/write_news_button_description" />
+
     <TextView
         android:id="@+id/news_name"
         android:layout_width="match_parent"
