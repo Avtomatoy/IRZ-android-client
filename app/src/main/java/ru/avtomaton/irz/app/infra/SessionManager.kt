@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
-import java.util.Objects
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -22,6 +21,7 @@ object SessionManager {
     private var initialized : Boolean = false
     private lateinit var dataStore: DataStore<Preferences>
 
+
     suspend fun login() : Boolean {
         if (!initialized) {
             throw java.lang.IllegalStateException("not initialized")
@@ -29,14 +29,17 @@ object SessionManager {
         val preferences = dataStore.data.first()
         val email = preferences[email]
         val password = preferences[password]
-        if (Objects.isNull(email) || Objects.isNull(password)) {
-            return false
-        }
-        val authBody = AuthBody(email!!, password!!)
+        email ?: return false
+        password ?: return false
+        val authBody = AuthBody(email, password)
         credentials.set(authBody)
         val result = AuthRepository.auth(authBody)
 
-        return result.isSuccess && result.getOrNull()!!
+        val authenticated = result.isSuccess && result.getOrNull()!!
+        if (!authenticated) {
+            dropCredentials()
+        }
+        return authenticated
     }
 
     fun init(dataStore: DataStore<Preferences>) {
@@ -52,11 +55,16 @@ object SessionManager {
         }
     }
 
+    suspend fun dropCredentials() {
+        credentials.set(null)
+        dataStore.edit { it.clear() }
+    }
+
     fun getCredentials() : AuthBody? {
         return credentials.get()
     }
 
     fun authenticated() : Boolean {
-        return Objects.isNull(credentials.get())
+        return credentials.get() != null
     }
 }

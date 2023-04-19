@@ -10,11 +10,16 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.activity.NewsActivity
+import ru.avtomaton.irz.app.client.IpHolder
+import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.databinding.ActivityMainBinding
 import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.infra.UserManager
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /**
+ * 1Az$dsdwdadqwdqds
  * Задачи:
  * 1) начать хранить креды, подгружать их после перезапуска приложения (shared preferences);
  * -2) сохранять токены при авторизации;
@@ -32,12 +37,27 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
  */
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.ipConfirm.setOnClickListener { onClick() }
+        setContentView(binding.root)
+    }
+
+    private fun onClick() {
+        val ip = binding.ipAddress.text.toString()
+        println("got ip $ip")
+        IpHolder.ip = ip
+        IrzClient.reinit()
         SessionManager.init(dataStore)
         this.lifecycleScope.launch {
-            SessionManager.login()
+            val login = SessionManager.login()
+            println("login result = $login")
+            if (login) {
+                UserManager.downloadInfo()
+            }
             startNews()
         }
     }

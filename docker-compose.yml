@@ -1,0 +1,11 @@
+services:
+
+  IrzUccDb:
+    image: postgres
+    container_name: IrzUccDb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=IrzPostgres
+      - POSTGRES_DB=IrzUccDb
+    ports:
+      - 5432:5432

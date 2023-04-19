@@ -8,16 +8,16 @@ import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
  */
 object AuthRepository {
 
-    suspend fun auth(authBody: AuthBody) : Result<Boolean> {
+    suspend fun auth(authBody: AuthBody): Result<Boolean> {
         return try {
-                val response = IrzClient.authApi.authenticate(authBody)
-                if (response.isSuccessful) {
-                    Result.success(true)
-                } else {
-                    Result.success(false)
-                }
-            } catch (ex : Throwable) {
-                Result.failure(ex)
+            val response = IrzClient.authApi.authenticate(authBody)
+            if (response.isSuccessful) {
+                Result.success(true)
+            } else {
+                Result.success(false)
             }
+        } catch (ex: Throwable) {
+            Result.failure(ex)
+        }
     }
 }

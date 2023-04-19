@@ -15,7 +15,7 @@ import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
 import ru.avtomaton.irz.app.infra.SessionManager
-import java.util.Objects
+import ru.avtomaton.irz.app.infra.UserManager
 
 /**
  * @author Anton Akkuzin
@@ -37,12 +37,6 @@ class AuthActivity : AppCompatActivity() {
 
         emailField = findViewById(R.id.auth_email)
         passwordField = findViewById(R.id.auth_password)
-
-        val credentials = SessionManager.getCredentials()
-        if (Objects.nonNull(credentials)) {
-            emailField.setText(credentials!!.email)
-            passwordField.setText(credentials.password)
-        }
 
         button = findViewById(R.id.auth_request_btn)
         awaitMessage = getString(R.string.auth_btn_await_message)
@@ -79,6 +73,7 @@ class AuthActivity : AppCompatActivity() {
             if (result.isSuccess) {
                 if (result.getOrNull()!!) {
                     SessionManager.setCredentials(authBody)
+                    UserManager.downloadInfo()
                     onAuthSuccess()
                 } else {
                     onAuthFailure()
@@ -91,14 +86,14 @@ class AuthActivity : AppCompatActivity() {
     private fun onAuthSuccess() {
         startActivity(Intent(
             this@AuthActivity,
-            MainActivity::class.java)
+            NewsActivity::class.java)
         )
     }
 
     private fun onAuthFailure() {
         Toast.makeText(
             this@AuthActivity,
-            "Мы Вас не узанали, попробуйте ещё раз!",
+            "Мы Вас не узнали, попробуйте ещё раз!",
             Toast.LENGTH_SHORT).show()
     }
 

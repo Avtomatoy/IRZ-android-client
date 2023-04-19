@@ -11,6 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.IRZAndroidclient"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -23,6 +24,13 @@
         </activity>
         <activity android:name=".activity.NewsActivity" />
         <activity android:name=".activity.AuthActivity" />
+        <activity android:name=".activity.ProfileActivity" />
+        <activity android:name=".activity.CurrentNewsItemActivity" />
+        <activity android:name=".activity.PostNewsActivity" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
