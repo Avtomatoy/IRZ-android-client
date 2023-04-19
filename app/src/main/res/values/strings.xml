@@ -15,6 +15,12 @@
     <string name="search_button_description">Кнопка Поиск</string>
     <string name="calendar_button_description">Кнопка События</string>
     <string name="profile_button_description">Кнопка Личный кабинет</string>
+    <string name="profile_surname_placeholder">Нечаев</string>
+    <string name="profile_name_placeholder">Сергей</string>
+    <string name="profile_patronymic_placeholder">Батикович</string>
+    <string name="profile_position_placeholder">Генеральный директор ИРЗ</string>
+    <string name="profile_about_myself_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
+    <string name="profile_my_doings_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
     <string name="like_button_description">Кнопка лайка</string>
     <string name="comment_button_description">Кнопка комментариев</string>
     <string name="write_news_button_description">Кнопка написания новости</string>
@@ -32,5 +38,10 @@
     <string name="public_news_switch">Публичная новость? </string>
     <string name="enable_public_news">Да</string>
     <string name="disable_public_news">Нет</string>
-
+    <string name="profile_action_logo_description">лого кнопки профиля</string>
+    <string name="profile_about_myself">О себе</string>
+    <string name="profile_my_doings">Чем занимаюсь</string>
+    <string name="profile_birthday">Дата рождения:</string>
+    <string name="profile_birthday_placeholder">16.02.2001</string>
+    <string name="profile_skills">Навыки/компетенции</string>
 </resources>

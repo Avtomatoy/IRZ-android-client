@@ -8,6 +8,8 @@ import ru.avtomaton.irz.app.client.api.images.ImageRepository
 import ru.avtomaton.irz.app.client.api.news.models.Author
 import ru.avtomaton.irz.app.client.api.news.models.News
 import ru.avtomaton.irz.app.client.api.news.models.NewsDto
+import ru.avtomaton.irz.app.client.api.users.models.UserRoles
+import ru.avtomaton.irz.app.infra.UserManager
 import java.util.UUID
 
 /**
@@ -42,7 +44,8 @@ class NewsRepository {
             news.isLiked,
             news.likesCount,
             news.author,
-            news.commentCount
+            news.commentCount,
+            news.canDelete
         )
     }
 
@@ -88,7 +91,19 @@ class NewsRepository {
                 dto.authorDto.patronymic,
                 authorImage
             ),
-            dto.commentCount
+            dto.commentCount,
+            canDelete(dto)
         )
+    }
+
+    private fun canDelete(newsDto: NewsDto): Boolean {
+        val user = UserManager.getInfo() ?: return false
+        if (newsDto.isPublic && UserRoles.isSupport(user)) {
+            return true
+        }
+        if (user.id == newsDto.authorDto.id) {
+            return true
+        }
+        return false
     }
 }

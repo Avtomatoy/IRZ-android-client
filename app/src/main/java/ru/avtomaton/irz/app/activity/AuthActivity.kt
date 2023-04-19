@@ -86,14 +86,14 @@ class AuthActivity : AppCompatActivity() {
     private fun onAuthSuccess() {
         startActivity(Intent(
             this@AuthActivity,
-            MainActivity::class.java)
+            NewsActivity::class.java)
         )
     }
 
     private fun onAuthFailure() {
         Toast.makeText(
             this@AuthActivity,
-            "Мы Вас не узанали, попробуйте ещё раз!",
+            "Мы Вас не узнали, попробуйте ещё раз!",
             Toast.LENGTH_SHORT).show()
     }
 

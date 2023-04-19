@@ -21,14 +21,30 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <TextView
-                android:id="@+id/news_title"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat_extrabold"
-                android:text="@string/news_title_placeholder"
-                android:textColor="@color/Pantone_295_C"
-                android:textSize="24sp" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/news_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:text="@string/news_title_placeholder"
+                    android:textColor="@color/Pantone_295_C"
+                    android:scrollHorizontally="false"
+                    android:textSize="24sp"
+                    />
+                <Button
+                    android:id="@+id/delete_button"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/Pantone_187_C"
+                    android:text="X"
+                    />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/news_author"

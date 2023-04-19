@@ -37,7 +37,7 @@ class PostNewsActivity : AppCompatActivity() {
         binding.removeImageButton.setOnClickListener { removeImage() }
         binding.publicNewsSwitch.visibility = View.GONE
         val userInfo = UserManager.getInfo()
-        if (userInfo != null && (userInfo.equals(UserRoles.support))) {
+        if (userInfo != null && UserRoles.isSupport(userInfo)) {
             binding.publicNewsSwitch.visibility = View.VISIBLE
         }
 

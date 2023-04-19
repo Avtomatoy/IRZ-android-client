@@ -1,8 +1,9 @@
 package ru.avtomaton.irz.app.client.api.images
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import retrofit2.Response
 import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.api.images.model.ImageDto
 import ru.avtomaton.irz.app.infra.Base64Converter
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -12,14 +13,20 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class ImageRepository {
 
-    private val decoder: Base64.Decoder = Base64.getDecoder()
     private val cache: MutableMap<UUID, Bitmap> = ConcurrentHashMap()
     suspend fun getImage(imageId: UUID): Bitmap? {
         return cache[imageId] ?: downloadImage(imageId)
     }
 
     private suspend fun downloadImage(imageId: UUID): Bitmap? {
-        val imageResponse = IrzClient.imagesApi.getImage(imageId)
+        val imageResponse: Response<ImageDto>?
+        try {
+            imageResponse = IrzClient.imagesApi.getImage(imageId)
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            return null
+        }
+
         if (!imageResponse.isSuccessful) {
             return null
         }

@@ -15,4 +15,13 @@ object UserRoles {
                 || possibleRole.equals(cabinetsManager, ignoreCase = true)
                 || possibleRole.equals(support, ignoreCase = true)
     }
+
+    fun isSupport(user: User): Boolean {
+        user.roles.forEach {
+            if (it.equals(support, ignoreCase = true)) {
+                return true
+            }
+        }
+        return false
+    }
 }

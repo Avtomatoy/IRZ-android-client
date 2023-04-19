@@ -3,6 +3,7 @@ package ru.avtomaton.irz.app.client.api.news
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -30,4 +31,7 @@ interface NewsApi {
 
     @POST(news)
     suspend fun postNews(@Body newsBody: NewsBody): Response<Unit>
+
+    @DELETE("$news/{id}")
+    suspend fun deleteNews(@Path("id") id: UUID): Response<Unit>
 }

@@ -1,11 +1,14 @@
 package ru.avtomaton.irz.app.activity.util
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.client.api.news.models.News
 import ru.avtomaton.irz.app.databinding.NewsItemBinding
+import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.infra.UserManager
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,6 +43,13 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
         }
     }
 
+    fun deleteNews(news: News) {
+        val index = this.news.indexOf(news)
+        if (this.news.remove(news)) {
+            notifyItemRemoved(index)
+        }
+    }
+
     inner class NewsViewHolder(
         private val newsItem: NewsItemBinding
     ) :
@@ -58,7 +68,6 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
             setLikeLogo()
             newsItem.likesCount.text = news.likesCount.toString()
             newsItem.commentsCount.text = news.commentCount.toString()
-            newsItem.likes.setOnClickListener { like() }
             newsItem.newsTitle.text = news.title
             news.author.image?.also { newsItem.newsAuthorImage.setImageBitmap(it) }
             val name = "${news.author.surname} ${news.author.firstName}"
@@ -67,6 +76,22 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
             newsItem.newsImage.setImageDrawable(null)
             news.image?.also { newsItem.newsImage.setImageBitmap(it) }
             newsItem.newsText.text = news.text
+            if (!SessionManager.authenticated()) {
+                newsItem.likes.visibility = View.GONE
+                return
+            }
+            newsItem.likes.setOnClickListener { like() }
+            newsItem.newsAuthor.setOnClickListener {
+                val id: UUID? =
+                    if (UserManager.getInfo()!!.id != news.author.id) news.author.id
+                    else null
+                listener.onProfileClick(id)
+            }
+            if (!news.canDelete) {
+                newsItem.deleteButton.visibility = View.GONE
+                return
+            }
+            newsItem.deleteButton.setOnClickListener { listener.onNewsDelete(news) }
         }
 
         private fun setLikeLogo() {
@@ -95,5 +120,9 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
         fun onDislike(newsId: UUID)
 
         fun onNewsClick(news: News)
+
+        fun onProfileClick(id: UUID?)
+
+        fun onNewsDelete(news: News)
     }
 }

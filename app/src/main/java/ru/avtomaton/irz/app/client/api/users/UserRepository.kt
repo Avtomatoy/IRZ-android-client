@@ -4,9 +4,7 @@ import android.graphics.Bitmap
 import retrofit2.Response
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.images.ImageRepository
-import ru.avtomaton.irz.app.client.api.users.models.User
-import ru.avtomaton.irz.app.client.api.users.models.UserDto
-import ru.avtomaton.irz.app.client.api.users.models.UserRoles
+import ru.avtomaton.irz.app.client.api.users.models.*
 import java.util.UUID
 
 /**
@@ -17,53 +15,58 @@ class UserRepository {
     private val imageRepository: ImageRepository = ImageRepository()
 
     suspend fun getMe(): User? {
-        val response: Response<UserDto>
+        val userResponse: Response<UserDto>
+        val positionsResponse: Response<List<PositionDto>>
         try {
-            response = IrzClient.usersApi.me();
+            userResponse = IrzClient.usersApi.me()
+            positionsResponse = IrzClient.usersApi.myUserPositions()
         } catch (ex: Throwable) {
             return null
         }
-        if (!response.isSuccessful) {
+        if (!userResponse.isSuccessful || !positionsResponse.isSuccessful) {
             return null
         }
-        return get(response.body()!!)
+        return get(userResponse.body()!!, positionsResponse.body()!!)
     }
 
     suspend fun getUser(id: UUID) : User? {
-        val response: Response<UserDto>
+        val userResponse: Response<UserDto>
+        val positionsResponse: Response<List<PositionDto>>
         try {
-            response = IrzClient.usersApi.user(id)
+            userResponse = IrzClient.usersApi.user(id)
+            positionsResponse = IrzClient.usersApi.userPositions(id)
         } catch (ex: Throwable) {
             return null
         }
-        if (!response.isSuccessful) {
+        if (!userResponse.isSuccessful || !positionsResponse.isSuccessful) {
             return null
         }
-        return get(response.body()!!)
+        return get(userResponse.body()!!, positionsResponse.body()!!)
     }
 
-    private suspend fun get(userDto: UserDto): User {
+    private suspend fun get(userDto: UserDto, positionDtoList: List<PositionDto>): User {
         val image = if (userDto.imageId != null) imageRepository.getImage(userDto.imageId) else null
-        return convert(userDto, image)
+        return convert(userDto, positionDtoList, image)
     }
 
-    private fun convert(userDto: UserDto, image: Bitmap?): User {
+    private fun convert(userDto: UserDto, positionDtoList: List<PositionDto>, image: Bitmap?): User {
         return User(
             userDto.id,
             userDto.firstName,
             userDto.surname,
-            userDto.patronymic,
+            userDto.patronymic.orEmpty(),
             userDto.birthday,
             image,
-            userDto.aboutMyself,
-            userDto.myDoings,
-            userDto.skills,
+            userDto.aboutMyself ?: "...",
+            userDto.myDoings ?: "...",
+            userDto.skills ?: "...",
             userDto.subscribersCount,
             userDto.subscriptionsCount,
             userDto.isSubscription,
             userDto.email,
             userDto.isActiveAccount,
-            roles(userDto)
+            roles(userDto),
+            positions(positionDtoList)
         )
     }
 
@@ -75,5 +78,12 @@ class UserRepository {
             }
         }
         return result
+    }
+
+    private fun positions(positionDtoList: List<PositionDto>): List<Position> {
+        return positionDtoList
+            .sortedByDescending { it.start }
+            .map { Position(it.start, it.end, it.position.name) }
+            .toList()
     }
 }

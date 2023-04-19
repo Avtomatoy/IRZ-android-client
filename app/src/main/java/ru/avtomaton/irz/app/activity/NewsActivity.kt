@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
 import ru.avtomaton.irz.app.client.IrzClient
@@ -49,7 +50,7 @@ class NewsActivity :
 
         if (SessionManager.authenticated()) {
             binding.profileButton.setOnClickListener {
-                startActivity(Intent(this, ProfileActivity::class.java))
+                onProfileClick(null)
             }
         } else {
             binding.writeNewsButton.visibility = View.GONE
@@ -103,7 +104,7 @@ class NewsActivity :
             try {
                 IrzClient.likesApi.like(newsId)
             } catch (ex: Throwable) {
-                // ignore
+                ex.printStackTrace()
             }
         }
     }
@@ -113,7 +114,7 @@ class NewsActivity :
             try {
                 IrzClient.likesApi.dislike(newsId)
             } catch (ex: Throwable) {
-                // ignore
+                ex.printStackTrace()
             }
         }
     }
@@ -136,6 +137,27 @@ class NewsActivity :
         if (resultCode == RESULT_OK && requestCode == postRequestCode) {
             print("update")
             setupAdapter()
+        }
+    }
+
+    override fun onProfileClick(id: UUID?) {
+        val intent = Intent(this, ProfileActivity::class.java)
+        intent.putExtra("id", id?.toString() ?: "")
+        startActivity(intent)
+    }
+
+    override fun onNewsDelete(news: News) {
+        this.lifecycleScope.launch {
+            val response: Response<Unit>
+            try {
+                response = IrzClient.newsApi.deleteNews(news.id)
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+                return@launch
+            }
+            if (response.isSuccessful) {
+                newsFeedAdapter.deleteNews(news)
+            }
         }
     }
 }
