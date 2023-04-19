@@ -10,7 +10,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.avtomaton.irz.app.client.api.news.models.NewsBody
 import ru.avtomaton.irz.app.client.api.news.models.NewsDto
-import ru.avtomaton.irz.app.client.news
+import ru.avtomaton.irz.app.constants.NEWS
 import java.util.UUID
 
 /**
@@ -18,20 +18,17 @@ import java.util.UUID
  */
 interface NewsApi {
 
-    @GET(news)
+    @GET(NEWS)
     suspend fun getNews(
-        @Query("PageIndex") pageIndex: Int,
-        @Query("PageSize") pageSize: Int
+        @Query("PageIndex") pageIndex: Int, @Query("PageSize") pageSize: Int
     ): Response<List<NewsDto>>
 
-    @GET("$news/{id}/full_text")
-    suspend fun getNewsFullText(
-        @Path("id") id: UUID
-    ): Response<ResponseBody>
+    @GET("$NEWS/{id}/full_text")
+    suspend fun getNewsFullText(@Path("id") id: UUID): Response<ResponseBody>
 
-    @POST(news)
+    @POST(NEWS)
     suspend fun postNews(@Body newsBody: NewsBody): Response<Unit>
 
-    @DELETE("$news/{id}")
+    @DELETE("$NEWS/{id}")
     suspend fun deleteNews(@Path("id") id: UUID): Response<Unit>
 }

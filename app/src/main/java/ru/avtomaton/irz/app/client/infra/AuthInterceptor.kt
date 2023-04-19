@@ -1,16 +1,15 @@
 package ru.avtomaton.irz.app.client.infra
 
 import com.google.gson.Gson
-import okhttp3.Interceptor
+import okhttp3.*
 import okhttp3.Interceptor.Chain
-import okhttp3.Request
-import okhttp3.Response
 import ru.avtomaton.irz.app.client.api.auth.models.JwtTokens
-import ru.avtomaton.irz.app.client.authentication_authenticate
+import ru.avtomaton.irz.app.constants.AUTHENTICATION_AUTHENTICATE
+import ru.avtomaton.irz.app.constants.AUTHENTICATION_REFRESH
+import ru.avtomaton.irz.app.constants.HTTP_UNAUTHORIZED
 import ru.avtomaton.irz.app.infra.SessionManager
+import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
-
-const val HTTP_UNAUTHORIZED = 401
 
 /**
  * @author Anton Akkuzin
@@ -18,11 +17,8 @@ const val HTTP_UNAUTHORIZED = 401
 class AuthInterceptor : Interceptor {
 
     private val gson: Gson = Gson()
-
-    private val authRequest: AtomicReference<Request?> = AtomicReference(null)
-
-    private var jwtTokens: AtomicReference<JwtTokens> =
-        AtomicReference(JwtTokens("", ""))
+    private val emptyTokens: JwtTokens = JwtTokens("", "")
+    private var tokens: AtomicReference<JwtTokens> = AtomicReference(emptyTokens)
 
     override fun intercept(chain: Chain): Response {
         if (isAuthRequest(chain)) {
@@ -33,43 +29,61 @@ class AuthInterceptor : Interceptor {
         }
         val request = insertBearerHeader(chain.request())
         val response = chain.proceed(request)
-        return retryIfNeeded(chain, response)
+        return retry(chain, response)
     }
 
     private fun insertBearerHeader(request: Request): Request {
         return request
             .newBuilder()
-            .addHeader("Authorization", "Bearer ${jwtTokens.get().jwtToken}")
+            .addHeader("Authorization", "Bearer ${tokens.get().jwtToken}")
             .build()
     }
 
     private fun interceptAuth(chain: Chain, request: Request): Response {
         val response = chain.proceed(request)
-
         if (response.isSuccessful) {
-            authRequest.set(response.request())
-            val newJwtTokens =
+            tokens.set(
                 gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), JwtTokens::class.java)
-            jwtTokens.set(newJwtTokens)
+            )
         }
         return response
     }
 
-    private fun retryIfNeeded(chain: Chain, response: Response): Response {
+    private fun retry(chain: Chain, response: Response): Response {
         if (response.code() != HTTP_UNAUTHORIZED) {
             return response
         }
-        println("Performing retry...")
-        val authReq = authRequest.get() ?: return response
-        val authResponse = interceptAuth(chain, authReq)
-        if (authResponse.isSuccessful) {
+        println("performing retry")
+        val refreshRequest = refreshRequest(chain.request())
+        val refreshResponse = interceptAuth(chain, refreshRequest)
+        if (refreshResponse.isSuccessful) {
+            println("retry successful")
             return chain.proceed(insertBearerHeader(chain.request()))
         }
-        authRequest.set(null)
+        tokens.set(emptyTokens)
         return response
     }
 
+    private fun refreshRequest(request: Request): Request {
+        val originUrl = request.url().url()
+        val url = URL(
+            originUrl.protocol,
+            originUrl.host,
+            originUrl.port,
+            AUTHENTICATION_REFRESH
+        )
+        return Request.Builder()
+            .url(url)
+            .post(
+                RequestBody.create(
+                    MediaType.parse("application/json"),
+                    gson.toJson(tokens)
+                )
+            )
+            .build()
+    }
+
     private fun isAuthRequest(chain: Chain): Boolean {
-        return chain.request().url().toString().contains(authentication_authenticate)
+        return chain.request().url().toString().contains(AUTHENTICATION_AUTHENTICATE)
     }
 }

@@ -4,13 +4,13 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import ru.avtomaton.irz.app.client.api.auth.AuthApi
 import ru.avtomaton.irz.app.client.api.images.ImagesApi
 import ru.avtomaton.irz.app.client.api.likes.LikesApi
 import ru.avtomaton.irz.app.client.api.news.NewsApi
 import ru.avtomaton.irz.app.client.api.users.UsersApi
 import ru.avtomaton.irz.app.client.infra.AuthInterceptor
+import java.net.URL
 
 /**
  * @author Anton Akkuzin
@@ -32,7 +32,7 @@ object IrzClient {
             .build()
         val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://${IpHolder.ip ?: "192.168.0.106"}:5249/api/")
+            .baseUrl(URL("http", "10.0.2.2", 5249, "/"))
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

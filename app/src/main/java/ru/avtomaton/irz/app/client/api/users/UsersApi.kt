@@ -7,6 +7,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.avtomaton.irz.app.client.api.users.models.PositionDto
 import ru.avtomaton.irz.app.client.api.users.models.UserDto
+import ru.avtomaton.irz.app.constants.USERS
 import java.util.UUID
 
 /**
@@ -14,21 +15,21 @@ import java.util.UUID
  */
 interface UsersApi {
 
-    @GET("users/me")
+    @GET("$USERS/me")
     suspend fun me(): Response<UserDto>
 
-    @GET("users/{id}")
+    @GET("$USERS/{id}")
     suspend fun user(@Path("id") id: UUID): Response<UserDto>
 
-    @GET("user_positions")
+    @GET("/api/user_positions")
     suspend fun userPositions(@Query("userId") userId: UUID): Response<List<PositionDto>>
 
-    @GET("user_positions/my")
+    @GET("/api/user_positions/my")
     suspend fun myUserPositions(): Response<List<PositionDto>>
 
-    @POST("subscriptions/subscribe")
+    @POST("/api/subscriptions/subscribe")
     suspend fun subscribe(@Query("userId") userId: UUID): Response<Unit>
 
-    @POST("subscriptions/unsubscribe")
+    @POST("/api/subscriptions/unsubscribe")
     suspend fun unsubscribe(@Query("userId") userId: UUID): Response<Unit>
 }

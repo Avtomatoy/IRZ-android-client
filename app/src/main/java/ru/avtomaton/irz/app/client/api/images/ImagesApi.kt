@@ -4,7 +4,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import ru.avtomaton.irz.app.client.api.images.model.ImageDto
-import ru.avtomaton.irz.app.client.images
+import ru.avtomaton.irz.app.constants.IMAGES
 import java.util.UUID
 
 /**
@@ -12,6 +12,6 @@ import java.util.UUID
  */
 interface ImagesApi {
 
-    @GET("$images/{id}")
+    @GET("$IMAGES/{id}")
     suspend fun getImage(@Path("id") id: UUID) : Response<ImageDto>
 }
