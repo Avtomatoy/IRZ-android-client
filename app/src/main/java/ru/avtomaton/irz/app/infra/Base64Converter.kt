@@ -28,7 +28,7 @@ object Base64Converter {
     fun convert(base64Str: String): Bitmap? {
         return try {
             val bytes = decoder.decode(base64Str)
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            BitmapFactory.decodeByteArray(decoder.decode(base64Str), 0, bytes.size)
         } catch (ex: Throwable) {
             ex.printStackTrace()
             null

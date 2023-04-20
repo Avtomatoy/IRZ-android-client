@@ -10,11 +10,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.activity.NewsActivity
-import ru.avtomaton.irz.app.client.IpHolder
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.databinding.ActivityMainBinding
 import ru.avtomaton.irz.app.infra.SessionManager
 import ru.avtomaton.irz.app.infra.UserManager
+import java.util.Properties
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -42,15 +42,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        binding.ipConfirm.setOnClickListener { onClick() }
         setContentView(binding.root)
-    }
 
-    private fun onClick() {
-        val ip = binding.ipAddress.text.toString()
-        println("got ip $ip")
-        IpHolder.ip = ip
-        IrzClient.reinit()
+        val props = Properties()
+        props.load(resources.openRawResource(R.raw.application))
+        IrzClient.init(props)
+
         SessionManager.init(dataStore)
         this.lifecycleScope.launch {
             val login = SessionManager.login()
@@ -58,11 +55,7 @@ class MainActivity : AppCompatActivity() {
             if (login) {
                 UserManager.downloadInfo()
             }
-            startNews()
+            startActivity(Intent(this@MainActivity, NewsActivity::class.java))
         }
-    }
-
-    private fun startNews() {
-        startActivity(Intent(this, NewsActivity::class.java))
     }
 }

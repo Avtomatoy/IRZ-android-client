@@ -11,6 +11,7 @@ import ru.avtomaton.irz.app.client.api.news.NewsApi
 import ru.avtomaton.irz.app.client.api.users.UsersApi
 import ru.avtomaton.irz.app.client.infra.AuthInterceptor
 import java.net.URL
+import java.util.Properties
 
 /**
  * @author Anton Akkuzin
@@ -22,34 +23,22 @@ object IrzClient {
     lateinit var imagesApi: ImagesApi
     lateinit var likesApi: LikesApi
 
-    init {
-        init()
-    }
-
-    fun init() {
+    fun init(props: Properties) {
+        val host = props.getProperty("server.host")!!
+        val port = props.getProperty("server.port")!!.toInt()
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
             .build()
         val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
         val retrofit = Retrofit.Builder()
-            .baseUrl(URL("http", "10.0.2.2", 5249, "/"))
+            .baseUrl(URL("http", host, port, "/"))
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-
         authApi = retrofit.create(AuthApi::class.java)
         usersApi = retrofit.create(UsersApi::class.java)
         newsApi = retrofit.create(NewsApi::class.java)
         imagesApi = retrofit.create(ImagesApi::class.java)
         likesApi = retrofit.create(LikesApi::class.java)
     }
-
-    fun reinit() {
-        init()
-    }
-}
-
-object IpHolder {
-    var ip: String? = null
-
 }
