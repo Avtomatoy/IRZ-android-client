@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicReference
 class AuthInterceptor : Interceptor {
 
     private val gson: Gson = Gson()
+    private val mediaType: MediaType = MediaType.get("application/json; charset=UTF-8")
+
     private val emptyTokens: JwtTokens = JwtTokens("", "")
     private var tokens: AtomicReference<JwtTokens> = AtomicReference(emptyTokens)
 
@@ -42,9 +44,7 @@ class AuthInterceptor : Interceptor {
     private fun interceptAuth(chain: Chain, request: Request): Response {
         val response = chain.proceed(request)
         if (response.isSuccessful) {
-            tokens.set(
-                gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), JwtTokens::class.java)
-            )
+            tokens.set(convert(response))
         }
         return response
     }
@@ -53,11 +53,9 @@ class AuthInterceptor : Interceptor {
         if (response.code() != HTTP_UNAUTHORIZED) {
             return response
         }
-        println("performing retry")
         val refreshRequest = refreshRequest(chain.request())
         val refreshResponse = interceptAuth(chain, refreshRequest)
         if (refreshResponse.isSuccessful) {
-            println("retry successful")
             return chain.proceed(insertBearerHeader(chain.request()))
         }
         tokens.set(emptyTokens)
@@ -74,16 +72,15 @@ class AuthInterceptor : Interceptor {
         )
         return Request.Builder()
             .url(url)
-            .post(
-                RequestBody.create(
-                    MediaType.parse("application/json"),
-                    gson.toJson(tokens)
-                )
-            )
+            .post(RequestBody.create(mediaType, gson.toJson(tokens.get())))
             .build()
     }
 
     private fun isAuthRequest(chain: Chain): Boolean {
         return chain.request().url().toString().contains(AUTHENTICATION_AUTHENTICATE)
+    }
+
+    private fun convert(response: Response): JwtTokens {
+        return gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), JwtTokens::class.java)
     }
 }
