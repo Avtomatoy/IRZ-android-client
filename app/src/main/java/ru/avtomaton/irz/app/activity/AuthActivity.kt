@@ -63,7 +63,6 @@ class AuthActivity : AppCompatActivity() {
                 return@launch
             }
             if (logged) {
-                SessionManager.saveCredentials(authBody)
                 onAuthSuccess()
                 return@launch
             }

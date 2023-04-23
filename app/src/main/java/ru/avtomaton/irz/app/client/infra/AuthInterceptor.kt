@@ -7,8 +7,8 @@ import ru.avtomaton.irz.app.client.api.auth.models.JwtTokens
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_AUTHENTICATE
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_REFRESH
 import ru.avtomaton.irz.app.constants.HTTP_UNAUTHORIZED
+import ru.avtomaton.irz.app.infra.SessionManager
 import java.net.URL
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author Anton Akkuzin
@@ -18,12 +18,12 @@ class AuthInterceptor : Interceptor {
     private val gson: Gson = Gson()
     private val mediaType: MediaType = MediaType.get("application/json; charset=UTF-8")
 
-    private val emptyTokens: JwtTokens = JwtTokens("", "")
-    private var tokens: AtomicReference<JwtTokens> = AtomicReference(emptyTokens)
-
     override fun intercept(chain: Chain): Response {
         if (isAuthRequest(chain)) {
             return interceptAuth(chain, chain.request())
+        }
+        if (!SessionManager.isAuthenticated()) {
+            return chain.proceed(chain.request())
         }
         val request = insertBearerHeader(chain.request())
         val response = chain.proceed(request)
@@ -33,14 +33,17 @@ class AuthInterceptor : Interceptor {
     private fun insertBearerHeader(request: Request): Request {
         return request
             .newBuilder()
-            .addHeader("Authorization", "Bearer ${tokens.get().jwtToken}")
+            .addHeader(
+                "Authorization",
+                "Bearer ${SessionManager.getTokens().jwtToken}"
+            )
             .build()
     }
 
     private fun interceptAuth(chain: Chain, request: Request): Response {
         val response = chain.proceed(request)
         if (response.isSuccessful) {
-            tokens.set(convert(response))
+            SessionManager.saveTokens(convert(response))
         }
         return response
     }
@@ -49,13 +52,14 @@ class AuthInterceptor : Interceptor {
         if (response.code() != HTTP_UNAUTHORIZED) {
             return response
         }
+        response.close()
         val refreshRequest = refreshRequest(chain.request())
         val refreshResponse = interceptAuth(chain, refreshRequest)
         if (refreshResponse.isSuccessful) {
             return chain.proceed(insertBearerHeader(chain.request()))
         }
-        tokens.set(emptyTokens)
-        return response
+        SessionManager.dropTokens()
+        return refreshResponse
     }
 
     private fun refreshRequest(request: Request): Request {
@@ -68,7 +72,7 @@ class AuthInterceptor : Interceptor {
         )
         return Request.Builder()
             .url(url)
-            .post(RequestBody.create(mediaType, gson.toJson(tokens.get())))
+            .post(RequestBody.create(mediaType, gson.toJson(SessionManager.getTokens())))
             .build()
     }
 

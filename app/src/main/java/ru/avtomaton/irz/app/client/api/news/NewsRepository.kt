@@ -1,42 +1,40 @@
 package ru.avtomaton.irz.app.client.api.news
 
 import android.graphics.Bitmap
-import okhttp3.ResponseBody
-import retrofit2.Response
 import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.OpResult
 import ru.avtomaton.irz.app.client.Repository
 import ru.avtomaton.irz.app.client.api.images.ImageRepository
 import ru.avtomaton.irz.app.client.api.news.models.Author
 import ru.avtomaton.irz.app.client.api.news.models.News
 import ru.avtomaton.irz.app.client.api.news.models.NewsDto
+import ru.avtomaton.irz.app.client.api.users.UserRepository
+import ru.avtomaton.irz.app.client.api.users.models.User
 import ru.avtomaton.irz.app.client.api.users.models.UserRoles
-import ru.avtomaton.irz.app.infra.UserManager
 import java.util.UUID
+import java.util.function.Predicate
 
 /**
  * @author Anton Akkuzin
  */
-class NewsRepository: Repository() {
+object NewsRepository : Repository() {
 
-    private val imageRepository: ImageRepository = ImageRepository()
-
-    private suspend fun getNewsFullText(id: UUID): String {
-        val response: Response<ResponseBody>
-        try {
-            response = authWrap(IrzClient.newsApi.getNewsFullText(id))
+    private suspend fun getNewsFullText(id: UUID): String? {
+        return try {
+            val response = IrzClient.newsApi.getNewsFullText(id)
+            if (!response.isSuccessful) {
+                return null
+            }
+            response.body()!!.string()
         } catch (ex: Throwable) {
             ex.printStackTrace()
-            return ""
+            null
         }
-        if (!response.isSuccessful) {
-            return ""
-        }
-        return response.body()!!.string()
     }
 
-    suspend fun getNewsWithFullText(news: News): News {
-        val text = getNewsFullText(news.id)
-        return News(
+    suspend fun getNewsWithFulltext(news: News): OpResult<News> {
+        val text = getNewsFullText(news.id) ?: return OpResult.Failure()
+        val value = News(
             news.id,
             news.title,
             text,
@@ -48,35 +46,46 @@ class NewsRepository: Repository() {
             news.commentCount,
             news.canDelete
         )
+        return OpResult.Success(value)
     }
 
-    suspend fun getNews(pageIndex: Int, pageSize: Int): MutableList<News>? {
-        val response: Response<List<NewsDto>>
-        try {
-            response = IrzClient.newsApi.getNews(pageIndex, pageSize)
+    suspend fun getNews(pageIndex: Int, pageSize: Int): OpResult<List<News>> {
+        return try {
+            val newsResponse = IrzClient.newsApi.getNews(pageIndex, pageSize)
+            val newsObserver = UserRepository.getMe()
+            if (!newsResponse.isSuccessful) {
+                return OpResult.Failure()
+            }
+            val newsList = newsResponse.body()!!
+                .map { it -> mapNewsDto(it) { canDelete(it, newsObserver) } }
+                .toList()
+            OpResult.Success(newsList)
         } catch (ex: Throwable) {
-            return null
+            ex.printStackTrace()
+            OpResult.Failure()
         }
-        if (!response.isSuccessful) {
-            return null
-        }
-        val result = mutableListOf<News>()
-        response.body()!!.forEach {
-            val newsImage: Bitmap? = if (it.imageId == null)
-                null
-            else imageRepository.getImage(it.imageId)
-
-            val authorImage: Bitmap? = if (it.authorDto.imageId == null)
-                null
-            else imageRepository.getImage(it.authorDto.imageId)
-
-            result.add(convertDto(it, newsImage, authorImage))
-        }
-        return result
     }
 
+    private suspend fun mapNewsDto(newsDto: NewsDto, canDelete: Predicate<NewsDto>): News {
+        return convertDto(
+            newsDto,
+            getImage(newsDto.imageId),
+            getImage(newsDto.authorDto.imageId),
+            canDelete.test(newsDto)
+        )
+    }
 
-    private fun convertDto(dto: NewsDto, newsImage: Bitmap?, authorImage: Bitmap?): News {
+    private suspend fun getImage(imageId: UUID?): Bitmap? {
+        if (imageId == null) {
+            return null
+        }
+        val result = ImageRepository.getImage(imageId)
+        return if (result.isOk) result.value() else null
+    }
+
+    private fun convertDto(
+        dto: NewsDto,
+        newsImage: Bitmap?, authorImage: Bitmap?, canDelete: Boolean): News {
         return News(
             dto.id,
             dto.title,
@@ -93,12 +102,15 @@ class NewsRepository: Repository() {
                 authorImage
             ),
             dto.commentCount,
-            canDelete(dto)
+            canDelete
         )
     }
 
-    private fun canDelete(newsDto: NewsDto): Boolean {
-        val user = UserManager.getInfo() ?: return false
+    private fun canDelete(newsDto: NewsDto, result: OpResult<User>): Boolean {
+        if (result.isFailure) {
+            return false
+        }
+        val user = result.value()
         if (newsDto.isPublic && UserRoles.isSupport(user)) {
             return true
         }
@@ -107,4 +119,48 @@ class NewsRepository: Repository() {
         }
         return false
     }
+
+
+//    @Deprecated("")
+//    suspend fun getNewsWithFullTextOld(news: News): News {
+//        val text = getNewsFullText(news.id)
+//        return News(
+//            news.id,
+//            news.title,
+//            text ?: "",
+//            news.image,
+//            news.dateTime,
+//            news.isLiked,
+//            news.likesCount,
+//            news.author,
+//            news.commentCount,
+//            news.canDelete
+//        )
+//    }
+//
+//    @Deprecated("")
+//    suspend fun getNewsOld(pageIndex: Int, pageSize: Int): MutableList<News>? {
+//        val response: Response<List<NewsDto>>
+//        try {
+//            response = IrzClient.newsApi.getNews(pageIndex, pageSize)
+//        } catch (ex: Throwable) {
+//            return null
+//        }
+//        if (!response.isSuccessful) {
+//            return null
+//        }
+//        val result = mutableListOf<News>()
+//        response.body()!!.forEach {
+//            val newsImage: Bitmap? = if (it.imageId == null)
+//                null
+//            else ImageRepository.getImageOld(it.imageId)
+//
+//            val authorImage: Bitmap? = if (it.authorDto.imageId == null)
+//                null
+//            else ImageRepository.getImageOld(it.authorDto.imageId)
+//
+//            result.add(convertDto(it, newsImage, authorImage))
+//        }
+//        return result
+//    }
 }

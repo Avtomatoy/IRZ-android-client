@@ -2,6 +2,7 @@ package ru.avtomaton.irz.app.infra
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import ru.avtomaton.irz.app.client.OpResult
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -14,7 +15,8 @@ object Base64Converter {
     private val decoder: Base64.Decoder = Base64.getDecoder()
     private val encoder: Base64.Encoder = Base64.getEncoder()
 
-    fun convert(bitmap: Bitmap): String? {
+    @Deprecated("")
+    fun convertOld(bitmap: Bitmap): String? {
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream)
         return try {
@@ -25,13 +27,36 @@ object Base64Converter {
         }
     }
 
-    fun convert(base64Str: String): Bitmap? {
+    @Deprecated("")
+    fun convertOld(base64Str: String): Bitmap? {
         return try {
             val bytes = decoder.decode(base64Str)
             BitmapFactory.decodeByteArray(decoder.decode(base64Str), 0, bytes.size)
         } catch (ex: Throwable) {
             ex.printStackTrace()
             null
+        }
+    }
+
+    fun convert(bitmap: Bitmap): OpResult<String> {
+        val outputStream = ByteArrayOutputStream()
+        return try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream)
+            OpResult.Success(encoder.encodeToString(outputStream.toByteArray()))
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            OpResult.Failure()
+        }
+    }
+
+    fun convert(base64Str: String): OpResult<Bitmap> {
+        return try {
+            val bytes = decoder.decode(base64Str)
+            val value = BitmapFactory.decodeByteArray(decoder.decode(base64Str), 0, bytes.size)
+            OpResult.Success(value)
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            OpResult.Failure()
         }
     }
 }

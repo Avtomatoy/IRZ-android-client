@@ -13,7 +13,6 @@ import ru.avtomaton.irz.app.activity.NewsActivity
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.databinding.ActivityMainBinding
 import ru.avtomaton.irz.app.infra.SessionManager
-import ru.avtomaton.irz.app.infra.UserManager
 import java.util.Properties
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -54,9 +53,6 @@ class MainActivity : AppCompatActivity() {
                 login = SessionManager.login()
             } catch (ex: Throwable) {
                 ex.printStackTrace()
-            }
-            if (login) {
-                UserManager.downloadInfo()
             }
             startActivity(Intent(this@MainActivity, NewsActivity::class.java))
         }

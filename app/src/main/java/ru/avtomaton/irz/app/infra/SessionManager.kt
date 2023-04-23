@@ -7,19 +7,27 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
+import ru.avtomaton.irz.app.client.api.auth.models.JwtTokens
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author Anton Akkuzin
  */
 object SessionManager {
 
-    private val email : Preferences.Key<String> = stringPreferencesKey("email")
-    private val password : Preferences.Key<String> = stringPreferencesKey("password")
+    private var tokens: AtomicReference<JwtTokens> = AtomicReference(null)
+
+    private val email: Preferences.Key<String> = stringPreferencesKey("email")
+    private val password: Preferences.Key<String> = stringPreferencesKey("password")
 
     private lateinit var dataStore: DataStore<Preferences>
 
     @Volatile
     private var authenticated: Boolean = false
+
+    fun init(dataStore: DataStore<Preferences>) {
+        this.dataStore = dataStore
+    }
 
     private suspend fun readCredentials(): AuthBody? {
         val preferences = dataStore.data.first()
@@ -38,21 +46,19 @@ object SessionManager {
     suspend fun login(authBody: AuthBody): Boolean {
         val response = IrzClient.authApi.authenticate(authBody)
         authenticated = response.isSuccessful
+        saveCredentials(authBody)
         return response.isSuccessful
     }
 
-    fun init(dataStore: DataStore<Preferences>) {
-        this.dataStore = dataStore
-    }
-
-    suspend fun saveCredentials(authBody: AuthBody) {
+    private suspend fun saveCredentials(authBody: AuthBody) {
         dataStore.edit {
-           it[email] = authBody.email
-           it[password] = authBody.password
+            it[email] = authBody.email
+            it[password] = authBody.password
         }
     }
 
-    suspend fun dropCredentials() {
+    suspend fun exit() {
+        dropTokens()
         dataStore.edit { it.clear() }
     }
 
@@ -60,7 +66,17 @@ object SessionManager {
         return authenticated
     }
 
-    fun setAuthenticated(value: Boolean) {
-        this.authenticated = value
+    fun saveTokens(jwtTokens: JwtTokens) {
+        tokens.set(jwtTokens)
+        authenticated = true
+    }
+
+    fun dropTokens() {
+        tokens.set(null)
+        authenticated = false
+    }
+
+    fun getTokens(): JwtTokens {
+        return tokens.get()
     }
 }

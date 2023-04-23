@@ -22,5 +22,6 @@ data class User(
     val email: String,
     val isActiveAccount: Boolean,
     val roles: List<String>,
-    val positions: List<Position>
+    val positions: List<Position>,
+    val isMe: Boolean,
 )

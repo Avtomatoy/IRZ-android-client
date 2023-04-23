@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,14 +23,12 @@ import java.util.*
  * @author Anton Akkuzin
  */
 class NewsActivity :
-    AppCompatActivity(),
+    AppCompatActivityBase(),
     NewsFeedAdapter.NewsFeedAdapterListener,
     SwipeRefreshLayout.OnRefreshListener {
 
     private val pageSize = 10
     private val postRequestCode = 228
-
-    private val newsRepository: NewsRepository = NewsRepository()
 
     private lateinit var binding: ActivityNewsBinding
     private lateinit var newsFeedAdapter: NewsFeedAdapter
@@ -50,7 +47,7 @@ class NewsActivity :
 
         if (SessionManager.isAuthenticated()) {
             binding.profileButton.setOnClickListener {
-                onProfileClick(null)
+                startActivity(ProfileActivity.openMyProfile(this))
             }
         } else {
             binding.writeNewsButton.visibility = View.GONE
@@ -87,7 +84,12 @@ class NewsActivity :
     }
 
     private suspend fun updateNews(pageIndex: Int, pageSize: Int) {
-        newsRepository.getNews(pageIndex, pageSize)?.also { newsFeedAdapter.updateNews(it) }
+        val result = NewsRepository.getNews(pageIndex, pageSize)
+        if (result.isFailure) {
+            onLoadErrorMessage()
+            return
+        }
+        newsFeedAdapter.updateNews(result.value())
     }
 
     inner class DoNothingBackPressedCallback : OnBackPressedCallback(true) {
@@ -121,12 +123,12 @@ class NewsActivity :
 
     override fun onNewsClick(news: News) {
         this.lifecycleScope.launch {
-            val newsWithFullText = newsRepository.getNewsWithFullText(news)
-            val intent = Intent(this@NewsActivity, CurrentNewsItemActivity::class.java)
-            intent.putExtra(newsItemKey, newsWithFullText)
-            CurrentNewsItemActivity.image = newsWithFullText.image
-            CurrentNewsItemActivity.authorImage = newsWithFullText.author.image
-            startActivity(intent)
+            val result = NewsRepository.getNewsWithFulltext(news)
+            if (result.isFailure) {
+                onLoadErrorMessage()
+                return@launch
+            }
+            startActivity(CurrentNewsItemActivity.open(this@NewsActivity, result.value()))
         }
     }
 
@@ -140,10 +142,8 @@ class NewsActivity :
         }
     }
 
-    override fun onProfileClick(id: UUID?) {
-        val intent = Intent(this, ProfileActivity::class.java)
-        intent.putExtra("id", id?.toString() ?: "")
-        startActivity(intent)
+    override fun onProfileClick(id: UUID) {
+        startActivity(ProfileActivity.openProfile(this, id))
     }
 
     override fun onNewsDelete(news: News) {

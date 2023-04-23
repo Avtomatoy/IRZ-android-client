@@ -48,4 +48,7 @@
     <string name="profile_birthday">Дата рождения:</string>
     <string name="profile_birthday_placeholder">16.02.2001</string>
     <string name="profile_skills">Навыки/компетенции</string>
+    <string name="profile_error_on_load">Произошла ошибка при загрузке информации</string>
+
+    <string name="common_on_load_error">Произошла ошибка при загрузке информации</string>
 </resources>
