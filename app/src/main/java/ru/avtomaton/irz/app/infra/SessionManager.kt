@@ -5,9 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
-import ru.avtomaton.irz.app.client.api.auth.AuthRepository
+import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author Anton Akkuzin
@@ -17,54 +16,51 @@ object SessionManager {
     private val email : Preferences.Key<String> = stringPreferencesKey("email")
     private val password : Preferences.Key<String> = stringPreferencesKey("password")
 
-    private val credentials : AtomicReference<AuthBody?> = AtomicReference(null)
-    private var initialized : Boolean = false
     private lateinit var dataStore: DataStore<Preferences>
 
+    @Volatile
+    private var authenticated: Boolean = false
 
-    suspend fun login() : Boolean {
-        if (!initialized) {
-            throw java.lang.IllegalStateException("not initialized")
-        }
+    private suspend fun readCredentials(): AuthBody? {
         val preferences = dataStore.data.first()
         val email = preferences[email]
         val password = preferences[password]
-        email ?: return false
-        password ?: return false
-        val authBody = AuthBody(email, password)
-        credentials.set(authBody)
-        val result = AuthRepository.auth(authBody)
+        email ?: return null
+        password ?: return null
+        return AuthBody(email, password)
+    }
 
-        val authenticated = result.isSuccess && result.getOrNull()!!
-        if (!authenticated) {
-            dropCredentials()
-        }
-        return authenticated
+    suspend fun login(): Boolean {
+        val authBody = readCredentials() ?: return false
+        return login(authBody)
+    }
+
+    suspend fun login(authBody: AuthBody): Boolean {
+        val response = IrzClient.authApi.authenticate(authBody)
+        authenticated = response.isSuccessful
+        return response.isSuccessful
     }
 
     fun init(dataStore: DataStore<Preferences>) {
         this.dataStore = dataStore
-        initialized = true
     }
 
-    suspend fun setCredentials(authBody: AuthBody) {
-        credentials.set(authBody)
-        dataStore.edit { settings ->
-            settings[email] = authBody.email
-            settings[password] = authBody.password
+    suspend fun saveCredentials(authBody: AuthBody) {
+        dataStore.edit {
+           it[email] = authBody.email
+           it[password] = authBody.password
         }
     }
 
     suspend fun dropCredentials() {
-        credentials.set(null)
         dataStore.edit { it.clear() }
     }
 
-    fun getCredentials() : AuthBody? {
-        return credentials.get()
+    fun isAuthenticated(): Boolean {
+        return authenticated
     }
 
-    fun authenticated() : Boolean {
-        return credentials.get() != null
+    fun setAuthenticated(value: Boolean) {
+        this.authenticated = value
     }
 }

@@ -7,7 +7,6 @@ import ru.avtomaton.irz.app.client.api.auth.models.JwtTokens
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_AUTHENTICATE
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_REFRESH
 import ru.avtomaton.irz.app.constants.HTTP_UNAUTHORIZED
-import ru.avtomaton.irz.app.infra.SessionManager
 import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
 
@@ -25,9 +24,6 @@ class AuthInterceptor : Interceptor {
     override fun intercept(chain: Chain): Response {
         if (isAuthRequest(chain)) {
             return interceptAuth(chain, chain.request())
-        }
-        if (!SessionManager.authenticated()) {
-            return chain.proceed(chain.request())
         }
         val request = insertBearerHeader(chain.request())
         val response = chain.proceed(request)

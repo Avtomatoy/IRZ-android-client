@@ -76,7 +76,7 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
             newsItem.newsImage.setImageDrawable(null)
             news.image?.also { newsItem.newsImage.setImageBitmap(it) }
             newsItem.newsText.text = news.text
-            if (!SessionManager.authenticated()) {
+            if (!SessionManager.isAuthenticated()) {
                 newsItem.likes.visibility = View.GONE
                 return
             }

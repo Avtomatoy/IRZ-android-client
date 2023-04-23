@@ -32,7 +32,6 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
  *  а) комментарии
  *  б) лайки
  *
- *
  * @author Anton Akkuzin
  */
 class MainActivity : AppCompatActivity() {
@@ -50,8 +49,12 @@ class MainActivity : AppCompatActivity() {
 
         SessionManager.init(dataStore)
         this.lifecycleScope.launch {
-            val login = SessionManager.login()
-            println("login result = $login")
+            var login = false
+            try {
+                login = SessionManager.login()
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+            }
             if (login) {
                 UserManager.downloadInfo()
             }

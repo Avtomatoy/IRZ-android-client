@@ -48,7 +48,7 @@ class NewsActivity :
             startActivityForResult(Intent(this, PostNewsActivity::class.java), postRequestCode)
         }
 
-        if (SessionManager.authenticated()) {
+        if (SessionManager.isAuthenticated()) {
             binding.profileButton.setOnClickListener {
                 onProfileClick(null)
             }

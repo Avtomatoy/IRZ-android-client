@@ -68,7 +68,7 @@ class PostNewsActivity : AppCompatActivity() {
                     ).show()
                     return@launch
                 }
-                imageDto = ImageDto("whatever", "png", base64);
+                imageDto = ImageDto("whatever", "png", base64)
             }
             val newsBody = NewsBody(title, text, binding.publicNewsSwitch.isChecked, imageDto)
             val response: Response<Unit>

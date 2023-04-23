@@ -6,6 +6,10 @@
     <string name="auth_textview_message">Вход</string>
     <string name="auth_email_hint">petrov@irz.ru</string>
     <string name="auth_password_hint">Пароль</string>
+    <string name="auth_missing_email">Не забудьте указать почту!</string>
+    <string name="auth_missing_password">Обязательно укажите пароль!</string>
+    <string name="auth_failure_message">Мы Вас не узнали, попробуйте ещё раз!</string>
+    <string name="auth_error_message">Нет связи с сервером!</string>
     <string name="email">email</string>
     <string name="password">password</string>
     <string name="main_logo">ЕЦК ИРЗ</string>

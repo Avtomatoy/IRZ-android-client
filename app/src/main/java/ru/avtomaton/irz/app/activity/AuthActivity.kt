@@ -10,26 +10,27 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import ru.avtomaton.irz.app.MainActivity
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.api.auth.AuthRepository
 import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
 import ru.avtomaton.irz.app.infra.SessionManager
-import ru.avtomaton.irz.app.infra.UserManager
 
 /**
  * @author Anton Akkuzin
  */
 class AuthActivity : AppCompatActivity() {
 
-    private val tag : String = "[Auth]"
+    private val tag: String = "[Auth]"
 
-    private lateinit var emailField : EditText
-    private lateinit var passwordField : EditText
-    private lateinit var button : Button
+    private lateinit var emailField: EditText
+    private lateinit var passwordField: EditText
+    private lateinit var button: Button
 
-    private lateinit var awaitMessage : String
-    private lateinit var authBtnMessage : String
+    private lateinit var awaitMessage: String
+    private lateinit var authBtnMessage: String
+    private lateinit var missingEmail: String
+    private lateinit var missingPassword: String
+    private lateinit var authFailure: String
+    private lateinit var authError: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,75 +42,66 @@ class AuthActivity : AppCompatActivity() {
         button = findViewById(R.id.auth_request_btn)
         awaitMessage = getString(R.string.auth_btn_await_message)
         authBtnMessage = getString(R.string.auth_btn_message)
+        missingEmail = getString(R.string.auth_missing_email)
+        missingPassword = getString(R.string.auth_missing_password)
+        authFailure = getString(R.string.auth_failure_message)
+        authError = getString(R.string.auth_error_message)
 
         button.setOnClickListener { auth() }
         onBackPressedDispatcher.addCallback(BackPressedCallback())
     }
 
     private fun auth() {
-        val email = emailField.text.toString()
-        if (email.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Не забудьте указать почту!",
-                Toast.LENGTH_SHORT).show()
-            return
-        }
-        val password = passwordField.text.toString()
-        if (password.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Обязательно укажите пароль!",
-                Toast.LENGTH_SHORT).show()
-            return
-        }
+        val authBody = extractCredentials() ?: return
         this.lifecycleScope.launch {
             button.text = awaitMessage
-            val authBody = AuthBody(email, password)
-            val result = AuthRepository.auth(authBody)
-            if (result.isFailure) {
-                onAuthError(result.exceptionOrNull()!!)
+            val logged: Boolean
+            try {
+                logged = SessionManager.login(authBody)
+            } catch (ex: Throwable) {
+                onAuthError(ex)
+                return@launch
             }
-            if (result.isSuccess) {
-                if (result.getOrNull()!!) {
-                    SessionManager.setCredentials(authBody)
-                    UserManager.downloadInfo()
-                    onAuthSuccess()
-                } else {
-                    onAuthFailure()
-                }
+            if (logged) {
+                SessionManager.saveCredentials(authBody)
+                onAuthSuccess()
+                return@launch
             }
+            onAuthFailure()
             button.text = authBtnMessage
         }
     }
 
+    private fun extractCredentials(): AuthBody? {
+        val email = emailField.text.toString()
+        if (email.isEmpty()) {
+            Toast.makeText(this, missingEmail, Toast.LENGTH_SHORT).show()
+            return null
+        }
+        val password = passwordField.text.toString()
+        if (password.isEmpty()) {
+            Toast.makeText(this, missingPassword, Toast.LENGTH_SHORT).show()
+            return null
+        }
+        return AuthBody(email, password)
+    }
+
     private fun onAuthSuccess() {
-        startActivity(Intent(
-            this@AuthActivity,
-            NewsActivity::class.java)
-        )
+        startActivity(Intent(this, NewsActivity::class.java))
     }
 
     private fun onAuthFailure() {
-        Toast.makeText(
-            this@AuthActivity,
-            "Мы Вас не узнали, попробуйте ещё раз!",
-            Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, authFailure, Toast.LENGTH_SHORT).show()
     }
 
     private fun onAuthError(t: Throwable) {
-        Toast.makeText(
-            this@AuthActivity,
-            "Нет связи с сервером!",
-            Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, authError, Toast.LENGTH_SHORT).show()
         Log.e(tag, "Error: ", t)
     }
 
     inner class BackPressedCallback : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            startActivity(
-                Intent(this@AuthActivity, NewsActivity::class.java)
-            )
+            startActivity(Intent(this@AuthActivity, NewsActivity::class.java))
         }
     }
 }

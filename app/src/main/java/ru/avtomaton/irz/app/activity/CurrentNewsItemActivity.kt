@@ -38,7 +38,7 @@ class CurrentNewsItemActivity: AppCompatActivity() {
         binding.newsImage.setImageDrawable(null)
         image?.also { binding.newsImage.setImageBitmap(it) }
         binding.newsText.text = news.text
-        if (SessionManager.authenticated()) {
+        if (SessionManager.isAuthenticated()) {
             binding.newsAuthor.setOnClickListener {
                 val id: UUID? =
                     if (UserManager.getInfo()!!.id != news.author.id) news.author.id

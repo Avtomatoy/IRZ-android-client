@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import okhttp3.ResponseBody
 import retrofit2.Response
 import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.Repository
 import ru.avtomaton.irz.app.client.api.images.ImageRepository
 import ru.avtomaton.irz.app.client.api.news.models.Author
 import ru.avtomaton.irz.app.client.api.news.models.News
@@ -15,14 +16,14 @@ import java.util.UUID
 /**
  * @author Anton Akkuzin
  */
-class NewsRepository {
+class NewsRepository: Repository() {
 
     private val imageRepository: ImageRepository = ImageRepository()
 
     private suspend fun getNewsFullText(id: UUID): String {
         val response: Response<ResponseBody>
         try {
-            response = IrzClient.newsApi.getNewsFullText(id)
+            response = authWrap(IrzClient.newsApi.getNewsFullText(id))
         } catch (ex: Throwable) {
             ex.printStackTrace()
             return ""
