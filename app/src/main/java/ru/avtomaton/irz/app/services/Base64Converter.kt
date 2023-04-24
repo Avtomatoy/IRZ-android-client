@@ -6,7 +6,6 @@ import ru.avtomaton.irz.app.model.OpResult
 import java.io.ByteArrayOutputStream
 import java.util.*
 
-
 /**
  * @author Anton Akkuzin
  */

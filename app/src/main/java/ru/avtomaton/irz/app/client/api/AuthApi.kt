@@ -3,7 +3,7 @@ package ru.avtomaton.irz.app.client.api
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
-import ru.avtomaton.irz.app.model.pojo.AuthBody
+import ru.avtomaton.irz.app.model.pojo.Credentials
 import ru.avtomaton.irz.app.model.pojo.JwtTokens
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_AUTHENTICATE
 
@@ -13,5 +13,5 @@ import ru.avtomaton.irz.app.constants.AUTHENTICATION_AUTHENTICATE
 interface AuthApi {
 
     @POST(AUTHENTICATION_AUTHENTICATE)
-    suspend fun authenticate(@Body authBody: AuthBody): Response<JwtTokens>
+    suspend fun authenticate(@Body credentials: Credentials): Response<JwtTokens>
 }

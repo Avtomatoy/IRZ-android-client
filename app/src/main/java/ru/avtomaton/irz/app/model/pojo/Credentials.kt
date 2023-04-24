@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * @author Anton Akkuzin
  */
-data class AuthBody(
+data class Credentials(
     @SerializedName("email") val email: String,
     @SerializedName("password") val password: String
 )

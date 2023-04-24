@@ -1,5 +1,6 @@
 package ru.avtomaton.irz.app.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +11,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.model.pojo.AuthBody
+import ru.avtomaton.irz.app.model.pojo.Credentials
 import ru.avtomaton.irz.app.services.CredentialsManager
 
 /**
@@ -70,7 +71,7 @@ class AuthActivity : AppCompatActivityBase() {
         }
     }
 
-    private fun extractCredentials(): AuthBody? {
+    private fun extractCredentials(): Credentials? {
         val email = emailField.text.toString()
         if (email.isEmpty()) {
             Toast.makeText(this, missingEmail, Toast.LENGTH_SHORT).show()
@@ -81,7 +82,7 @@ class AuthActivity : AppCompatActivityBase() {
             Toast.makeText(this, missingPassword, Toast.LENGTH_SHORT).show()
             return null
         }
-        return AuthBody(email, password)
+        return Credentials(email, password)
     }
 
     private fun onAuthSuccess() {
@@ -99,7 +100,14 @@ class AuthActivity : AppCompatActivityBase() {
 
     inner class BackPressedCallback : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            startActivity(Intent(this@AuthActivity, NewsActivity::class.java))
+            startActivity(NewsActivity.openNews(this@AuthActivity))
+        }
+    }
+
+    companion object {
+
+        fun open(context: Context): Intent {
+            return Intent(context, AuthActivity::class.java)
         }
     }
 }

@@ -30,7 +30,7 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bindNews(news[position])
         holder.itemView.setOnClickListener { listener.onNewsClick(holder.getNews()) }
-        listener.onUpdate(itemCount, position)
+        listener.onNewsUpdate(itemCount, position)
     }
 
     fun updateNews(news: List<News>) {
@@ -87,34 +87,27 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
         }
 
         private fun setLikeLogo() {
-            val id = if (liked) R.drawable.heartred else R.drawable.heart
+            val id = if (liked)
+                R.drawable.heartred
+            else
+                R.drawable.heart
             newsItem.likeLogo.setImageResource(id)
         }
 
         private fun like() {
             liked = !liked
-            if (liked) {
-                listener.onLike(news.id)
-                likesCount++
-            } else {
-                listener.onDislike(news.id)
-                likesCount--
-            }
+            likesCount += if (liked) 1 else -1
+            listener.onNewsLike(news.id, liked)
             setLikeLogo()
             newsItem.likesCount.text = likesCount.toString()
         }
     }
 
     interface NewsFeedAdapterListener {
-        fun onUpdate(listSize: Int, position: Int)
-        fun onLike(newsId: UUID)
-
-        fun onDislike(newsId: UUID)
-
+        fun onNewsUpdate(listSize: Int, position: Int)
+        fun onNewsLike(newsId: UUID, liked: Boolean)
         fun onNewsClick(news: News)
-
-        fun onProfileClick(id: UUID)
-
         fun onNewsDelete(news: News)
+        fun onProfileClick(id: UUID)
     }
 }

@@ -1,5 +1,6 @@
 package ru.avtomaton.irz.app.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
@@ -124,5 +125,12 @@ class PostNewsActivity : AppCompatActivityBase() {
         binding.addImageButton.visibility = View.VISIBLE
         binding.removeImageButton.visibility = View.GONE
         binding.newsImage.visibility = View.GONE
+    }
+
+    companion object {
+
+        fun open(context: Context): Intent {
+            return Intent(context, PostNewsActivity::class.java)
+        }
     }
 }

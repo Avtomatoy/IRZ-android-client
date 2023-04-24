@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import ru.avtomaton.irz.app.client.IrzClient
-import ru.avtomaton.irz.app.model.pojo.AuthBody
+import ru.avtomaton.irz.app.model.pojo.Credentials
 import ru.avtomaton.irz.app.model.pojo.JwtTokens
 import java.util.concurrent.atomic.AtomicReference
 
@@ -29,13 +29,18 @@ object CredentialsManager {
         this.dataStore = dataStore
     }
 
-    private suspend fun readCredentials(): AuthBody? {
-        val preferences = dataStore.data.first()
-        val email = preferences[email]
-        val password = preferences[password]
-        email ?: return null
-        password ?: return null
-        return AuthBody(email, password)
+    private suspend fun readCredentials(): Credentials? {
+        return try {
+            val preferences = dataStore.data.first()
+            val email = preferences[email]
+            val password = preferences[password]
+            email ?: return null
+            password ?: return null
+            Credentials(email, password)
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            null
+        }
     }
 
     suspend fun login(): Boolean {
@@ -43,17 +48,22 @@ object CredentialsManager {
         return login(authBody)
     }
 
-    suspend fun login(authBody: AuthBody): Boolean {
-        val response = IrzClient.authApi.authenticate(authBody)
-        authenticated = response.isSuccessful
-        saveCredentials(authBody)
-        return response.isSuccessful
+    suspend fun login(credentials: Credentials): Boolean {
+        return try {
+            val response = IrzClient.authApi.authenticate(credentials)
+            authenticated = response.isSuccessful
+            saveCredentials(credentials)
+            response.isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
     }
 
-    private suspend fun saveCredentials(authBody: AuthBody) {
+    private suspend fun saveCredentials(credentials: Credentials) {
         dataStore.edit {
-            it[email] = authBody.email
-            it[password] = authBody.password
+            it[email] = credentials.email
+            it[password] = credentials.password
         }
     }
 

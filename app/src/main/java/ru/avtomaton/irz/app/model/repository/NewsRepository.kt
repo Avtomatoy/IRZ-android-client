@@ -15,6 +15,16 @@ import java.util.function.Predicate
  */
 object NewsRepository {
 
+    suspend fun tryDeleteNews(newsId: UUID): Boolean {
+        return try {
+            val response = IrzClient.newsApi.deleteNews(newsId)
+            response.isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
+    }
+
     private suspend fun getNewsFullText(id: UUID): String? {
         return try {
             val response = IrzClient.newsApi.getNewsFullText(id)
