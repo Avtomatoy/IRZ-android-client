@@ -14,3 +14,6 @@ const val MY_POSITIONS = "/api/user_positions/my"
 const val NEWS = "/api/news"
 
 const val USERS = "/api/users"
+
+const val SUBSCRIPTIONS_SUBSCRIBE = "/api/subscriptions/subscribe"
+const val SUBSCRIPTIONS_UNSUBSCRIBE = "/api/subscriptions/unsubscribe"

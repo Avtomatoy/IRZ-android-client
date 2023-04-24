@@ -4,13 +4,8 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.avtomaton.irz.app.client.api.UserPositionsApi
-import ru.avtomaton.irz.app.client.api.auth.AuthApi
-import ru.avtomaton.irz.app.client.api.images.ImagesApi
-import ru.avtomaton.irz.app.client.api.likes.LikesApi
-import ru.avtomaton.irz.app.client.api.news.NewsApi
-import ru.avtomaton.irz.app.client.api.users.UsersApi
-import ru.avtomaton.irz.app.client.infra.AuthInterceptor
+import retrofit2.create
+import ru.avtomaton.irz.app.client.api.*
 import java.net.URL
 import java.util.Properties
 
@@ -24,6 +19,7 @@ object IrzClient {
     lateinit var imagesApi: ImagesApi
     lateinit var likesApi: LikesApi
     lateinit var positionsApi: UserPositionsApi
+    lateinit var subscriptionsApi: SubscriptionsApi
 
     fun init(props: Properties) {
         val host = props.getProperty("server.host")!!
@@ -43,5 +39,6 @@ object IrzClient {
         imagesApi = retrofit.create(ImagesApi::class.java)
         likesApi = retrofit.create(LikesApi::class.java)
         positionsApi = retrofit.create(UserPositionsApi::class.java)
+        subscriptionsApi = retrofit.create(SubscriptionsApi::class.java)
     }
 }

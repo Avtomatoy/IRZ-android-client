@@ -5,10 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.api.news.models.News
-import ru.avtomaton.irz.app.constants.DateFormats
+import ru.avtomaton.irz.app.activity.AppCompatActivityBase
+import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.databinding.NewsItemBinding
-import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
 /**
@@ -69,12 +69,12 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
             news.author.image?.also { newsItem.newsAuthorImage.setImageBitmap(it) }
             val name = "${news.author.surname} ${news.author.firstName}"
             newsItem.newsAuthorName.text = name
-            newsItem.newsDatetime.text = DateFormats.simpleDateFormat.format(news.dateTime)
+            newsItem.newsDatetime.text = AppCompatActivityBase.dateFormat.format(news.dateTime)
             newsItem.newsImage.setImageDrawable(null)
             news.image?.also { newsItem.newsImage.setImageBitmap(it) }
             newsItem.newsText.text = news.text
             newsItem.deleteButton.visibility = View.GONE
-            if (!SessionManager.isAuthenticated()) {
+            if (!CredentialsManager.isAuthenticated()) {
                 newsItem.likes.visibility = View.GONE
                 return
             }

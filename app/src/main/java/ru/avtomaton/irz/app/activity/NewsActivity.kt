@@ -13,10 +13,10 @@ import retrofit2.Response
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
 import ru.avtomaton.irz.app.client.IrzClient
-import ru.avtomaton.irz.app.client.api.news.NewsRepository
-import ru.avtomaton.irz.app.client.api.news.models.News
+import ru.avtomaton.irz.app.model.repository.NewsRepository
+import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.databinding.ActivityNewsBinding
-import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
 /**
@@ -45,7 +45,7 @@ class NewsActivity :
             startActivityForResult(Intent(this, PostNewsActivity::class.java), postRequestCode)
         }
 
-        if (SessionManager.isAuthenticated()) {
+        if (CredentialsManager.isAuthenticated()) {
             binding.profileButton.setOnClickListener {
                 startActivity(ProfileActivity.openMyProfile(this))
             }
@@ -86,7 +86,7 @@ class NewsActivity :
     private suspend fun updateNews(pageIndex: Int, pageSize: Int) {
         val result = NewsRepository.getNews(pageIndex, pageSize)
         if (result.isFailure) {
-            onLoadErrorMessage()
+            error()
             return
         }
         newsFeedAdapter.updateNews(result.value())
@@ -125,7 +125,7 @@ class NewsActivity :
         this.lifecycleScope.launch {
             val result = NewsRepository.getNewsWithFulltext(news)
             if (result.isFailure) {
-                onLoadErrorMessage()
+                error()
                 return@launch
             }
             startActivity(CurrentNewsItemActivity.open(this@NewsActivity, result.value()))

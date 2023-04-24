@@ -4,16 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.client.IrzClient
-import ru.avtomaton.irz.app.client.OpResult
-import ru.avtomaton.irz.app.client.api.users.UserRepository
-import ru.avtomaton.irz.app.client.api.users.models.User
+import ru.avtomaton.irz.app.model.OpResult
+import ru.avtomaton.irz.app.model.repository.UserRepository
+import ru.avtomaton.irz.app.model.pojo.User
 import ru.avtomaton.irz.app.databinding.ActivityProfileBinding
-import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
 /**
@@ -21,15 +20,12 @@ import java.util.*
  */
 class ProfileActivity : AppCompatActivityBase() {
 
-    private lateinit var errorLoadMessage: String
-
     private lateinit var binding: ActivityProfileBinding
     private lateinit var user: User
     private var isSubscription: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        errorLoadMessage = getString(R.string.profile_error_on_load)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         val possibleId = intent.getStringExtra("id")
         val id: UUID? = if (possibleId!!.isEmpty()) null else UUID.fromString(possibleId)
@@ -58,7 +54,7 @@ class ProfileActivity : AppCompatActivityBase() {
 
     private fun exit() {
         this.lifecycleScope.launch {
-            SessionManager.exit()
+            CredentialsManager.exit()
             startActivity(Intent(this@ProfileActivity, NewsActivity::class.java))
         }
     }
@@ -66,9 +62,9 @@ class ProfileActivity : AppCompatActivityBase() {
     private fun onSubscribe() {
         this.lifecycleScope.launch {
             if (isSubscription) {
-                IrzClient.usersApi.subscribe(user.id)
+                IrzClient.subscriptionsApi.subscribe(user.id)
             } else {
-                IrzClient.usersApi.unsubscribe(user.id)
+                IrzClient.subscriptionsApi.unsubscribe(user.id)
             }
             isSubscription = !isSubscription
             setSubscriptionBackground()
@@ -79,8 +75,7 @@ class ProfileActivity : AppCompatActivityBase() {
         this.lifecycleScope.launch {
             val userResult = getUser(id)
             if (userResult.isFailure) {
-                Toast.makeText(this@ProfileActivity, errorLoadMessage, Toast.LENGTH_SHORT)
-                    .show()
+                error()
                 return@launch
             }
             bindUserInfo(userResult.value())
@@ -95,7 +90,7 @@ class ProfileActivity : AppCompatActivityBase() {
     }
 
     private fun bindUserInfo(user: User) {
-        binding.birthday.text = simpleDateFormat.format(user.birthday)
+        binding.birthday.text = dateFormat.format(user.birthday)
         binding.aboutMyselfText.text = user.aboutMyself
         binding.profileSkillsText.text = user.skills
         binding.profileMyDoingsText.text = user.myDoings

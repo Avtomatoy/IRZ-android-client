@@ -7,17 +7,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.api.auth.models.AuthBody
-import ru.avtomaton.irz.app.infra.SessionManager
+import ru.avtomaton.irz.app.model.pojo.AuthBody
+import ru.avtomaton.irz.app.services.CredentialsManager
 
 /**
  * @author Anton Akkuzin
  */
-class AuthActivity : AppCompatActivity() {
+class AuthActivity : AppCompatActivityBase() {
 
     private val tag: String = "[Auth]"
 
@@ -57,7 +56,7 @@ class AuthActivity : AppCompatActivity() {
             button.text = awaitMessage
             val logged: Boolean
             try {
-                logged = SessionManager.login(authBody)
+                logged = CredentialsManager.login(authBody)
             } catch (ex: Throwable) {
                 onAuthError(ex)
                 return@launch

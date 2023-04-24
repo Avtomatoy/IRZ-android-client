@@ -11,12 +11,17 @@ import java.util.*
  */
 open class AppCompatActivityBase : AppCompatActivity() {
 
-    protected val simpleDateFormat: SimpleDateFormat =
-        SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale("ru"))
+    companion object {
+        val dateFormat: SimpleDateFormat =
+            SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale("ru"))
+    }
 
-
-    protected fun onLoadErrorMessage() {
+    protected fun error() {
         val onLoadErrorMessage: String = getString(R.string.common_on_load_error)
         Toast.makeText(this, onLoadErrorMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    protected fun warn(value: String) {
+        Toast.makeText(this, value, Toast.LENGTH_SHORT).show()
     }
 }
