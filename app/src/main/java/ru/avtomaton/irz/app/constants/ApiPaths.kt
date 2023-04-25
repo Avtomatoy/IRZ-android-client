@@ -2,6 +2,7 @@ package ru.avtomaton.irz.app.constants
 
 const val AUTHENTICATION_AUTHENTICATE = "/api/authentication/authenticate"
 const val AUTHENTICATION_REFRESH = "/api/authentication/refresh"
+const val AUTHENTICATION_SEND_REST_PASSWORD_URL = "/api/authentication/send_reset_password_url"
 
 const val IMAGES = "/api/images"
 

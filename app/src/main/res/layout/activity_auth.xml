@@ -19,14 +19,14 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textSize="24sp"
-            android:text="@string/auth_textview_message" />
+            android:text="@string/auth_activity_title" />
 
         <EditText
             android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/auth_email_hint"
+            android:hint="@string/auth_activity_email_placeholder"
             android:inputType="textEmailAddress"
             android:minHeight="48dp"
             android:autofillHints="" />
@@ -38,13 +38,23 @@
             android:ems="10"
             android:inputType="textPassword"
             android:minHeight="48dp"
-            android:hint="@string/auth_password_hint"
+            android:hint="@string/auth_activity_password_placeholder"
             android:autofillHints="" />
 
         <Button
             android:id="@+id/auth_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/auth_btn_message" />
+            android:text="@string/auth_activity_sign_in_button_title" />
+
+        <TextView
+            android:id="@+id/forgot_password_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/auth_activity_forgot_password_title"
+            android:textAlignment="center"
+            android:layout_marginTop="25dp"
+            />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
