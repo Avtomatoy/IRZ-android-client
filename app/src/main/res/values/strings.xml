@@ -6,6 +6,10 @@
     <string name="auth_textview_message">Вход</string>
     <string name="auth_email_hint">petrov@irz.ru</string>
     <string name="auth_password_hint">Пароль</string>
+    <string name="auth_missing_email">Не забудьте указать почту!</string>
+    <string name="auth_missing_password">Обязательно укажите пароль!</string>
+    <string name="auth_failure_message">Мы Вас не узнали, попробуйте ещё раз!</string>
+    <string name="auth_error_message">Нет связи с сервером!</string>
     <string name="email">email</string>
     <string name="password">password</string>
     <string name="main_logo">ЕЦК ИРЗ</string>
@@ -19,8 +23,8 @@
     <string name="profile_name_placeholder">Сергей</string>
     <string name="profile_patronymic_placeholder">Батикович</string>
     <string name="profile_position_placeholder">Генеральный директор ИРЗ</string>
-    <string name="profile_about_myself_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
-    <string name="profile_my_doings_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
+    <string name="profile_about_myself_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла …</string>
+    <string name="profile_my_doings_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла …</string>
     <string name="like_button_description">Кнопка лайка</string>
     <string name="comment_button_description">Кнопка комментариев</string>
     <string name="write_news_button_description">Кнопка написания новости</string>
@@ -29,12 +33,16 @@
     <string name="news_title_placeholder">Название новости</string>
     <string name="news_author_name_placeholder">Нечаев Сергей</string>
     <string name="news_author_image_description">Картинка</string>
-    <string name="news_text_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла ...</string>
+    <string name="news_text_placeholder">Бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла бла  бла бла …</string>
     <string name="news_datetime_placeholder">24.02.2022, 13:37</string>
     <string name="news_image_description">Картинка</string>
     <string name="add_image_text">Добавить изображение</string>
     <string name="remove_image_text">Убрать изображение</string>
     <string name="post_news_button">Опубликовать</string>
+    <string name="post_news_missing_header">Укажите заголовок!</string>
+    <string name="post_news_missing_text">Укажите текст новости!</string>
+    <string name="post_news_image_load_error">Проблема с загрузкой изображения…</string>
+    <string name="post_news_error_on_post">Не удалось загрузить новость…</string>
     <string name="public_news_switch">Публичная новость? </string>
     <string name="enable_public_news">Да</string>
     <string name="disable_public_news">Нет</string>
@@ -44,4 +52,6 @@
     <string name="profile_birthday">Дата рождения:</string>
     <string name="profile_birthday_placeholder">16.02.2001</string>
     <string name="profile_skills">Навыки/компетенции</string>
+
+    <string name="common_on_load_error">Произошла ошибка при загрузке информации</string>
 </resources>

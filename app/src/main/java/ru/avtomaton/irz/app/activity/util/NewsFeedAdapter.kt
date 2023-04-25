@@ -5,11 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.api.news.models.News
+import ru.avtomaton.irz.app.activity.AppCompatActivityBase
+import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.databinding.NewsItemBinding
-import ru.avtomaton.irz.app.infra.SessionManager
-import ru.avtomaton.irz.app.infra.UserManager
-import java.text.SimpleDateFormat
+import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
 /**
@@ -19,8 +18,6 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
     RecyclerView.Adapter<NewsFeedAdapter.NewsViewHolder>() {
 
     private val news: MutableList<News> = mutableListOf()
-    private val dateFormat: SimpleDateFormat =
-        SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale("ru"))
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val from = LayoutInflater.from(parent.context)
@@ -33,10 +30,10 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bindNews(news[position])
         holder.itemView.setOnClickListener { listener.onNewsClick(holder.getNews()) }
-        listener.onUpdate(itemCount, position)
+        listener.onNewsUpdate(itemCount, position)
     }
 
-    fun updateNews(news: MutableList<News>) {
+    fun updateNews(news: List<News>) {
         news.forEach {
             this.news.add(it)
             notifyItemInserted(this.news.size - 1)
@@ -72,57 +69,45 @@ class NewsFeedAdapter(private val listener: NewsFeedAdapterListener) :
             news.author.image?.also { newsItem.newsAuthorImage.setImageBitmap(it) }
             val name = "${news.author.surname} ${news.author.firstName}"
             newsItem.newsAuthorName.text = name
-            newsItem.newsDatetime.text = dateFormat.format(news.dateTime)
+            newsItem.newsDatetime.text = AppCompatActivityBase.dateFormat.format(news.dateTime)
             newsItem.newsImage.setImageDrawable(null)
             news.image?.also { newsItem.newsImage.setImageBitmap(it) }
             newsItem.newsText.text = news.text
-            if (!SessionManager.authenticated()) {
+            newsItem.deleteButton.visibility = View.GONE
+            if (!CredentialsManager.isAuthenticated()) {
                 newsItem.likes.visibility = View.GONE
                 return
             }
             newsItem.likes.setOnClickListener { like() }
-            newsItem.newsAuthor.setOnClickListener {
-                val id: UUID? =
-                    if (UserManager.getInfo()!!.id != news.author.id) news.author.id
-                    else null
-                listener.onProfileClick(id)
+            newsItem.newsAuthor.setOnClickListener { listener.onProfileClick(news.author.id) }
+            if (news.canDelete) {
+                newsItem.deleteButton.visibility = View.VISIBLE
+                newsItem.deleteButton.setOnClickListener { listener.onNewsDelete(news) }
             }
-            if (!news.canDelete) {
-                newsItem.deleteButton.visibility = View.GONE
-                return
-            }
-            newsItem.deleteButton.setOnClickListener { listener.onNewsDelete(news) }
         }
 
         private fun setLikeLogo() {
-            val id = if (liked) R.drawable.heartred else R.drawable.heart
+            val id = if (liked)
+                R.drawable.heartred
+            else
+                R.drawable.heart
             newsItem.likeLogo.setImageResource(id)
         }
 
         private fun like() {
             liked = !liked
-            if (liked) {
-                listener.onLike(news.id)
-                likesCount++
-            } else {
-                listener.onDislike(news.id)
-                likesCount--
-            }
+            likesCount += if (liked) 1 else -1
+            listener.onNewsLike(news.id, liked)
             setLikeLogo()
             newsItem.likesCount.text = likesCount.toString()
         }
     }
 
     interface NewsFeedAdapterListener {
-        fun onUpdate(listSize: Int, position: Int)
-        fun onLike(newsId: UUID)
-
-        fun onDislike(newsId: UUID)
-
+        fun onNewsUpdate(listSize: Int, position: Int)
+        fun onNewsLike(newsId: UUID, liked: Boolean)
         fun onNewsClick(news: News)
-
-        fun onProfileClick(id: UUID?)
-
         fun onNewsDelete(news: News)
+        fun onProfileClick(id: UUID)
     }
 }

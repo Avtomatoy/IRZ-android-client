@@ -5,12 +5,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-import ru.avtomaton.irz.app.client.api.auth.AuthApi
-import ru.avtomaton.irz.app.client.api.images.ImagesApi
-import ru.avtomaton.irz.app.client.api.likes.LikesApi
-import ru.avtomaton.irz.app.client.api.news.NewsApi
-import ru.avtomaton.irz.app.client.api.users.UsersApi
-import ru.avtomaton.irz.app.client.infra.AuthInterceptor
+import ru.avtomaton.irz.app.client.api.*
+import java.net.URL
+import java.util.Properties
 
 /**
  * @author Anton Akkuzin
@@ -21,35 +18,27 @@ object IrzClient {
     lateinit var newsApi: NewsApi
     lateinit var imagesApi: ImagesApi
     lateinit var likesApi: LikesApi
+    lateinit var positionsApi: UserPositionsApi
+    lateinit var subscriptionsApi: SubscriptionsApi
 
-    init {
-        init()
-    }
-
-    fun init() {
+    fun init(props: Properties) {
+        val host = props.getProperty("server.host")!!
+        val port = props.getProperty("server.port")!!.toInt()
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
             .build()
         val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://${IpHolder.ip ?: "192.168.0.106"}:5249/api/")
+            .baseUrl(URL("http", host, port, "/"))
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-
         authApi = retrofit.create(AuthApi::class.java)
         usersApi = retrofit.create(UsersApi::class.java)
         newsApi = retrofit.create(NewsApi::class.java)
         imagesApi = retrofit.create(ImagesApi::class.java)
         likesApi = retrofit.create(LikesApi::class.java)
+        positionsApi = retrofit.create(UserPositionsApi::class.java)
+        subscriptionsApi = retrofit.create(SubscriptionsApi::class.java)
     }
-
-    fun reinit() {
-        init()
-    }
-}
-
-object IpHolder {
-    var ip: String? = null
-
 }
