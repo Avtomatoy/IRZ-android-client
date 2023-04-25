@@ -22,7 +22,7 @@
             android:text="@string/auth_textview_message" />
 
         <EditText
-            android:id="@+id/auth_email"
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -32,7 +32,7 @@
             android:autofillHints="" />
 
         <EditText
-            android:id="@+id/auth_password"
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -42,7 +42,7 @@
             android:autofillHints="" />
 
         <Button
-            android:id="@+id/auth_request_btn"
+            android:id="@+id/auth_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/auth_btn_message" />

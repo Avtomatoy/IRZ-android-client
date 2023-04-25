@@ -11,6 +11,8 @@ import java.util.*
  */
 open class AppCompatActivityBase : AppCompatActivity() {
 
+    val tag: String = this.javaClass.simpleName
+
     companion object {
         val dateFormat: SimpleDateFormat =
             SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale("ru"))

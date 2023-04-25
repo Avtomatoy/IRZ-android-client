@@ -4,13 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.R
+import ru.avtomaton.irz.app.databinding.ActivityAuthBinding
 import ru.avtomaton.irz.app.model.pojo.Credentials
 import ru.avtomaton.irz.app.services.CredentialsManager
 
@@ -19,83 +17,64 @@ import ru.avtomaton.irz.app.services.CredentialsManager
  */
 class AuthActivity : AppCompatActivityBase() {
 
-    private val tag: String = "[Auth]"
-
-    private lateinit var emailField: EditText
-    private lateinit var passwordField: EditText
-    private lateinit var button: Button
-
     private lateinit var awaitMessage: String
-    private lateinit var authBtnMessage: String
+    private lateinit var buttonName: String
     private lateinit var missingEmail: String
     private lateinit var missingPassword: String
     private lateinit var authFailure: String
     private lateinit var authError: String
 
+    private lateinit var binding: ActivityAuthBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
+        onBackPressedDispatcher.addCallback(BackPressedCallback())
 
-        emailField = findViewById(R.id.auth_email)
-        passwordField = findViewById(R.id.auth_password)
+        binding = ActivityAuthBinding.inflate(layoutInflater)
+        binding.authButton.setOnClickListener { this.lifecycleScope.launch { auth() } }
 
-        button = findViewById(R.id.auth_request_btn)
         awaitMessage = getString(R.string.auth_btn_await_message)
-        authBtnMessage = getString(R.string.auth_btn_message)
+        buttonName = getString(R.string.auth_btn_message)
         missingEmail = getString(R.string.auth_missing_email)
         missingPassword = getString(R.string.auth_missing_password)
         authFailure = getString(R.string.auth_failure_message)
         authError = getString(R.string.auth_error_message)
 
-        button.setOnClickListener { auth() }
-        onBackPressedDispatcher.addCallback(BackPressedCallback())
+        setContentView(binding.root)
     }
 
-    private fun auth() {
+    private suspend fun auth() {
         val authBody = extractCredentials() ?: return
-        this.lifecycleScope.launch {
-            button.text = awaitMessage
-            val logged: Boolean
-            try {
-                logged = CredentialsManager.login(authBody)
-            } catch (ex: Throwable) {
-                onAuthError(ex)
-                return@launch
-            }
-            if (logged) {
-                onAuthSuccess()
-                return@launch
-            }
-            onAuthFailure()
-            button.text = authBtnMessage
+        binding.authButton.text = awaitMessage
+        val logged: Boolean
+        try {
+            logged = CredentialsManager.login(authBody)
+        } catch (ex: Throwable) {
+            Log.e(tag, "Authenticate request failed with exception", ex)
+            warn(authError)
+            return
         }
+        if (!logged) {
+            warn(authFailure)
+            binding.authButton.text = buttonName
+            return
+        }
+
+        startActivity(NewsActivity.openNews(this))
     }
 
     private fun extractCredentials(): Credentials? {
-        val email = emailField.text.toString()
+        val email = binding.email.text.toString()
         if (email.isEmpty()) {
-            Toast.makeText(this, missingEmail, Toast.LENGTH_SHORT).show()
+            warn(missingEmail)
             return null
         }
-        val password = passwordField.text.toString()
+        val password = binding.password.text.toString()
         if (password.isEmpty()) {
-            Toast.makeText(this, missingPassword, Toast.LENGTH_SHORT).show()
+            warn(missingPassword)
             return null
         }
         return Credentials(email, password)
-    }
-
-    private fun onAuthSuccess() {
-        startActivity(Intent(this, NewsActivity::class.java))
-    }
-
-    private fun onAuthFailure() {
-        Toast.makeText(this, authFailure, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onAuthError(t: Throwable) {
-        Toast.makeText(this, authError, Toast.LENGTH_SHORT).show()
-        Log.e(tag, "Error: ", t)
     }
 
     inner class BackPressedCallback : OnBackPressedCallback(true) {

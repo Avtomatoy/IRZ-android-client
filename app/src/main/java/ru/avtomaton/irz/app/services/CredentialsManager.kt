@@ -49,15 +49,10 @@ object CredentialsManager {
     }
 
     suspend fun login(credentials: Credentials): Boolean {
-        return try {
-            val response = IrzClient.authApi.authenticate(credentials)
-            authenticated = response.isSuccessful
-            saveCredentials(credentials)
-            response.isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
-        }
+        val response = IrzClient.authApi.authenticate(credentials)
+        authenticated = response.isSuccessful
+        saveCredentials(credentials)
+        return response.isSuccessful
     }
 
     private suspend fun saveCredentials(credentials: Credentials) {
