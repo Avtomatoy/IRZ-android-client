@@ -9,7 +9,7 @@ const val IMAGES = "/api/images"
 const val LIKES_LIKE = "/api/likes/like_news_entry"
 const val LIKES_UNLIKE = "/api/likes/unlike_news_entry"
 
-const val POSITIONS = "/api/user_positions"
+const val USER_POSITIONS = "/api/user_positions"
 const val MY_POSITIONS = "/api/user_positions/my"
 
 const val NEWS = "/api/news"
@@ -18,3 +18,5 @@ const val USERS = "/api/users"
 
 const val SUBSCRIPTIONS_SUBSCRIBE = "/api/subscriptions/subscribe"
 const val SUBSCRIPTIONS_UNSUBSCRIBE = "/api/subscriptions/unsubscribe"
+
+const val POSITIONS = "/api/positions"

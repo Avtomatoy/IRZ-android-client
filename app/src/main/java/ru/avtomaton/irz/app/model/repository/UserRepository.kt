@@ -2,11 +2,13 @@ package ru.avtomaton.irz.app.model.repository
 
 import android.graphics.Bitmap
 import retrofit2.Response
+import ru.avtomaton.irz.app.activity.util.SearchParams
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.Position
 import ru.avtomaton.irz.app.model.pojo.User
 import ru.avtomaton.irz.app.model.pojo.UserDto
+import ru.avtomaton.irz.app.model.pojo.UserShort
 import java.util.UUID
 
 /**
@@ -16,6 +18,34 @@ object UserRepository {
 
     private const val threeDots = "…"
     private var me: User? = null
+
+    suspend fun getUsers(searchParams: SearchParams): OpResult<List<UserShort>> {
+        return try {
+            val response = IrzClient.usersApi.getUsers(
+                searchParams.positionId,
+                searchParams.role,
+                searchParams.searchString,
+                searchParams.pageIndex,
+                searchParams.pageSize
+            )
+            if (!response.isSuccessful) {
+                return OpResult.Failure()
+            }
+            val list = response.body()!!.map {
+                UserShort(
+                    it.id,
+                    it.firstName,
+                    it.surname,
+                    it.patronymic.orEmpty(),
+                    getImage(it.imageId)
+                )
+            }.toList()
+            OpResult.Success(list)
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            OpResult.Failure()
+        }
+    }
 
     suspend fun getMe(fromCache: Boolean = false): OpResult<User> {
         if (fromCache && me != null) {

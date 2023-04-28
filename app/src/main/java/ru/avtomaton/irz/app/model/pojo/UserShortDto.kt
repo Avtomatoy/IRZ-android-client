@@ -6,7 +6,7 @@ import java.util.UUID
 /**
  * @author Anton Akkuzin
  */
-data class AuthorDto(
+data class UserShortDto(
     @SerializedName("id") val id: UUID,
     @SerializedName("firstName") val firstName: String,
     @SerializedName("surname") val surname: String,

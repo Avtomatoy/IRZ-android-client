@@ -3,6 +3,7 @@ package ru.avtomaton.irz.app.activity
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import ru.avtomaton.irz.app.R
+import ru.avtomaton.irz.app.model.OpResult
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,5 +26,13 @@ open class AppCompatActivityBase : AppCompatActivity() {
 
     protected fun warn(value: String) {
         Toast.makeText(this, value, Toast.LENGTH_SHORT).show()
+    }
+
+    protected fun <T> OpResult<T>.applyIfSuccess(block: T.() -> Unit) {
+        if (this.isFailure) {
+            error()
+            return
+        }
+        block(this.value())
     }
 }

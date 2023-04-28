@@ -51,7 +51,6 @@ class AuthActivity : AppCompatActivityBase() {
         dialogSuccess = getString(R.string.auth_activity_forgot_password_success)
         dialogFail = getString(R.string.auth_activity_forgot_password_fail)
 
-
         setContentView(binding.root)
     }
 

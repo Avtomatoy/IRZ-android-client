@@ -14,6 +14,15 @@ import java.util.UUID
  */
 interface UsersApi {
 
+    @GET(USERS)
+    suspend fun getUsers(
+        @Query("PositionId") positionId: UUID?,
+        @Query("Role") role: String?,
+        @Query("SearchString") searchString: String?,
+        @Query("PageIndex") pageIndex: Int,
+        @Query("PageSize") pageSize: Int
+    ): Response<List<UserDto>>
+
     @GET("$USERS/me")
     suspend fun getMe(): Response<UserDto>
 
