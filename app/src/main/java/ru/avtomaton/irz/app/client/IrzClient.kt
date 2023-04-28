@@ -18,8 +18,9 @@ object IrzClient {
     lateinit var newsApi: NewsApi
     lateinit var imagesApi: ImagesApi
     lateinit var likesApi: LikesApi
-    lateinit var positionsApi: UserPositionsApi
+    lateinit var userPositionsApi: UserPositionsApi
     lateinit var subscriptionsApi: SubscriptionsApi
+    lateinit var positionsApi: PositionsApi
 
     fun init(props: Properties) {
         val host = props.getProperty("server.host")!!
@@ -38,7 +39,8 @@ object IrzClient {
         newsApi = retrofit.create(NewsApi::class.java)
         imagesApi = retrofit.create(ImagesApi::class.java)
         likesApi = retrofit.create(LikesApi::class.java)
-        positionsApi = retrofit.create(UserPositionsApi::class.java)
+        userPositionsApi = retrofit.create(UserPositionsApi::class.java)
         subscriptionsApi = retrofit.create(SubscriptionsApi::class.java)
+        positionsApi = retrofit.create(PositionsApi::class.java)
     }
 }

@@ -14,7 +14,7 @@ open class NavbarAppCompatActivityBase: AppCompatActivityBase(), NavbarListener 
     }
 
     override fun onSearchClick() {
-        TODO("Not yet implemented")
+        startActivity(SearchActivity.open(this))
     }
 
     override fun onEventsClick() {

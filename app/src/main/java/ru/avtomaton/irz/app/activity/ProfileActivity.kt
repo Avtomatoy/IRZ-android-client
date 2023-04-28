@@ -18,7 +18,7 @@ import java.util.*
 /**
  * @author Anton Akkuzin
  */
-class ProfileActivity : AppCompatActivityBase() {
+class ProfileActivity : NavbarAppCompatActivityBase() {
 
     private lateinit var binding: ActivityProfileBinding
     private lateinit var user: User
@@ -27,6 +27,13 @@ class ProfileActivity : AppCompatActivityBase() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
+
+        binding.newsButton.setOnClickListener { onNewsClick() }
+        binding.messengerButton.setOnClickListener { onMessengerClick() }
+        binding.searchButton.setOnClickListener { onSearchClick() }
+        binding.eventsButton.setOnClickListener { onEventsClick() }
+        binding.profileButton.setOnClickListener { onProfileClick() }
+
         val possibleId = intent.getStringExtra("id")
         val id: UUID? = if (possibleId!!.isEmpty()) null else UUID.fromString(possibleId)
         binding.sectionMain.visibility = View.GONE

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/user_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:backgroundTint="@color/Cool_Grey_3"
+    android:orientation="vertical"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="7dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/search_activity_params_name"
+            android:textSize="20sp"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:gravity="center"
+            android:textColor="@color/Pantone_295_C"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/search_activity_params_position_name"
+            android:textSize="20sp"
+            android:fontFamily="@font/montserrat"
+            android:gravity="start"
+            android:textColor="@color/Pantone_295_C"
+            android:layout_marginStart="5dp"
+            />
+
+        <Spinner
+            android:id="@+id/position"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:spinnerMode="dropdown"
+            android:layout_marginStart="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/search_activity_params_role_name"
+            android:textSize="20sp"
+            android:fontFamily="@font/montserrat"
+            android:gravity="start"
+            android:textColor="@color/Pantone_295_C"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="5dp"
+            />
+
+        <Spinner
+            android:id="@+id/role"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:spinnerMode="dropdown"
+            android:layout_marginStart="5dp"
+            />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

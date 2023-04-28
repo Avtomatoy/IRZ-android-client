@@ -13,11 +13,11 @@ import java.util.UUID
 object UserPositionsRepository {
 
     suspend fun getMyPositions(): OpResult<List<Position>> {
-        return getPositions { IrzClient.positionsApi.myUserPositions() }
+        return getPositions { IrzClient.userPositionsApi.myUserPositions() }
     }
 
     suspend fun getUserPositions(id: UUID): OpResult<List<Position>> {
-        return getPositions { IrzClient.positionsApi.userPositions(id) }
+        return getPositions { IrzClient.userPositionsApi.userPositions(id) }
     }
 
     private suspend fun getPositions(

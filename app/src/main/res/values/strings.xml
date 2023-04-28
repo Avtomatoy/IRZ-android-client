@@ -65,4 +65,15 @@
     <string name="auth_activity_forgot_password_fail">Не удалось отправить информацию на почту…</string>
     <!--  auth_activity  -->
 
+    <!--  search_activity  -->
+    <string name="search_activity_name">Поиск</string>
+    <string name="search_activity_user_input_hint">Иванов Иван Иванович</string>
+    <string name="search_activity_search_button">Поиск</string>
+    <string name="search_activity_search_params_button">Параметры</string>
+    <string name="search_activity_search_user_name">Нечаев Сергей Анатольевич</string>
+    <string name="search_activity_params_name">Параметры</string>
+    <string name="search_activity_params_position_name">Должность</string>
+    <string name="search_activity_params_role_name">Роль</string>
+    <!--  search_activity  -->
+
 </resources>

@@ -16,7 +16,7 @@ data class News(
     val dateTime: Date,
     val isLiked: Boolean,
     val likesCount: Int,
-    val author: Author,
+    val author: UserShort,
     val commentCount: Int,
     val canDelete: Boolean
 ): Serializable

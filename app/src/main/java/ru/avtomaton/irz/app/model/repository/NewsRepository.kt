@@ -3,7 +3,7 @@ package ru.avtomaton.irz.app.model.repository
 import android.graphics.Bitmap
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.model.OpResult
-import ru.avtomaton.irz.app.model.pojo.Author
+import ru.avtomaton.irz.app.model.pojo.UserShort
 import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.model.pojo.NewsDto
 import ru.avtomaton.irz.app.model.pojo.User
@@ -100,7 +100,7 @@ object NewsRepository {
             dto.dateTime,
             dto.isLiked,
             dto.likesCount,
-            Author(
+            UserShort(
                 dto.authorDto.id,
                 dto.authorDto.firstName,
                 dto.authorDto.surname,

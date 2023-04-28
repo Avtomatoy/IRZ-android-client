@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/search_activity_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Cool_Grey_1"
+        android:clickable="true"
+        android:fontFamily="@font/montserrat_extrabold"
+        android:paddingStart="5sp"
+        android:paddingEnd="5sp"
+        android:text="@string/search_activity_name"
+        android:textAlignment="textStart"
+        android:textColor="@color/Pantone_289_C"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        app:drawableEndCompat="@drawable/irz_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/search_parameters_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/users_area"
+        app:layout_constraintTop_toBottomOf="@+id/search_activity_name">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/user_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:fontFamily="@font/montserrat"
+            android:inputType="text"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+
+            <Button
+                android:id="@+id/search_request_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:text="@string/search_activity_search_button"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:backgroundTint="@color/Pantone_289_C"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/search_params_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_activity_search_params_button"
+                android:backgroundTint="@color/Pantone_200_C"
+                tools:ignore="ButtonStyle" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/users_area"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_area"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_parameters_area" />
+
+    <LinearLayout
+        android:id="@+id/button_area"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageButton
+            android:id="@+id/news_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".20"
+            android:adjustViewBounds="true"
+            android:backgroundTint="@color/Pantone_289_C"
+            android:contentDescription="@string/news_button_description"
+            android:scaleType="centerInside"
+            android:src="@drawable/news_button" />
+
+        <ImageButton
+            android:id="@+id/messenger_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".20"
+            android:adjustViewBounds="true"
+            android:backgroundTint="@color/Pantone_289_C"
+            android:contentDescription="@string/message_button_description"
+            android:scaleType="centerInside"
+            android:src="@drawable/message_button" />
+
+        <ImageButton
+            android:id="@+id/zearch_button"
+            android:layout_width="wrap_content"
+            android:layout_weight=".20"
+            android:layout_height="match_parent"
+            android:src="@drawable/search_button"
+            android:backgroundTint="@color/Pantone_289_C"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/search_button_description" />
+
+        <ImageButton
+            android:id="@+id/events_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".20"
+            android:adjustViewBounds="true"
+            android:backgroundTint="@color/Pantone_289_C"
+            android:contentDescription="@string/calendar_button_description"
+            android:scaleType="centerInside"
+            android:src="@drawable/calendar_button" />
+
+        <ImageButton
+            android:id="@+id/profile_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".20"
+            android:adjustViewBounds="true"
+            android:backgroundTint="@color/Pantone_289_C"
+            android:contentDescription="@string/profile_button_description"
+            android:scaleType="centerInside"
+            android:src="@drawable/profile_button" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

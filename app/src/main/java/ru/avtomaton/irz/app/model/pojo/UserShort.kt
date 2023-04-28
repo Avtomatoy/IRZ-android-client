@@ -7,7 +7,7 @@ import java.io.Serializable
 /**
  * @author Anton Akkuzin
  */
-data class Author(
+data class UserShort(
     val id: UUID,
     val firstName: String,
     val surname: String,
