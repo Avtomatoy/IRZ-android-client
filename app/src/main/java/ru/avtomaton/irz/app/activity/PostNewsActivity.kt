@@ -3,7 +3,6 @@ package ru.avtomaton.irz.app.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
@@ -27,14 +26,13 @@ class PostNewsActivity : AppCompatActivityBase() {
     private lateinit var missingText: String
     private lateinit var imageLoadError: String
     private lateinit var errorOnPost: String
-    private val imageRequestCode: Int = 1337
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         missingHeader = getString(R.string.post_news_missing_header)
         missingText = getString(R.string.post_news_missing_text)
-        imageLoadError = getString(R.string.post_news_image_load_error)
+        imageLoadError = getString(R.string.common_on_image_upload_error)
         errorOnPost = getString(R.string.post_news_error_on_post)
 
         binding = ActivityPostNewsBinding.inflate(layoutInflater)
@@ -45,6 +43,13 @@ class PostNewsActivity : AppCompatActivityBase() {
         binding.removeImageButton.setOnClickListener { removeImage() }
         binding.publicNewsSwitch.visibility = View.GONE
         tryEnableSwitch()
+
+        block = { uri ->
+            binding.newsImage.setImageURI(uri)
+            binding.addImageButton.visibility = View.GONE
+            binding.removeImageButton.visibility = View.VISIBLE
+            binding.newsImage.visibility = View.VISIBLE
+        }
 
         setContentView(binding.root)
     }
@@ -101,23 +106,6 @@ class PostNewsActivity : AppCompatActivityBase() {
             setResult(RESULT_OK)
             finish()
         }
-    }
-
-    private fun uploadImage() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.data = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        startActivityForResult(intent, imageRequestCode)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != RESULT_OK || requestCode != imageRequestCode || data == null) {
-            return
-        }
-        binding.newsImage.setImageURI(data.data)
-        binding.addImageButton.visibility = View.GONE
-        binding.removeImageButton.visibility = View.VISIBLE
-        binding.newsImage.visibility = View.VISIBLE
     }
 
     private fun removeImage() {

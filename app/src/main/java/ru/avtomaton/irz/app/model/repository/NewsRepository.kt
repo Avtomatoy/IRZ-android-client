@@ -1,6 +1,7 @@
 package ru.avtomaton.irz.app.model.repository
 
 import android.graphics.Bitmap
+import retrofit2.Response
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.UserShort
@@ -14,6 +15,24 @@ import java.util.function.Predicate
  * @author Anton Akkuzin
  */
 object NewsRepository {
+
+    suspend fun tryLikeNews(newsId: UUID): Boolean {
+        return try {
+            IrzClient.likesApi.like(newsId).isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun tryDislikeNews(newsId: UUID): Boolean {
+        return try {
+            IrzClient.likesApi.dislike(newsId).isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
+    }
 
     suspend fun tryDeleteNews(newsId: UUID): Boolean {
         return try {
@@ -55,9 +74,25 @@ object NewsRepository {
         return OpResult.Success(value)
     }
 
-    suspend fun getNews(pageIndex: Int, pageSize: Int): OpResult<List<News>> {
+    suspend fun getAuthorNews(
+        userId: UUID,
+        pageIndex: Int,
+        pageSize: Int
+    ): OpResult<List<News>> {
+        return getAnyNews { IrzClient.newsApi.getNews(userId, pageIndex, pageSize) }
+    }
+
+    suspend fun getNews(
+        pageIndex: Int,
+        pageSize: Int
+    ): OpResult<List<News>> {
+        return getAnyNews { IrzClient.newsApi.getNews(null, pageIndex, pageSize) }
+    }
+
+    private suspend fun getAnyNews(block: suspend () -> Response<List<NewsDto>>)
+            : OpResult<List<News>> {
         return try {
-            val newsResponse = IrzClient.newsApi.getNews(pageIndex, pageSize)
+            val newsResponse = block()
             val newsObserver = UserRepository.getMe()
             if (!newsResponse.isSuccessful) {
                 return OpResult.Failure()
@@ -91,7 +126,8 @@ object NewsRepository {
 
     private fun convertDto(
         dto: NewsDto,
-        newsImage: Bitmap?, authorImage: Bitmap?, canDelete: Boolean): News {
+        newsImage: Bitmap?, authorImage: Bitmap?, canDelete: Boolean
+    ): News {
         return News(
             dto.id,
             dto.title,

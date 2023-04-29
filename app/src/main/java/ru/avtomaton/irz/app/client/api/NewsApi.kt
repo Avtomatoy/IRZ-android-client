@@ -20,7 +20,9 @@ interface NewsApi {
 
     @GET(NEWS)
     suspend fun getNews(
-        @Query("PageIndex") pageIndex: Int, @Query("PageSize") pageSize: Int
+        @Query("AuthorId") authorId: UUID?,
+        @Query("PageIndex") pageIndex: Int,
+        @Query("PageSize") pageSize: Int
     ): Response<List<NewsDto>>
 
     @GET("$NEWS/{id}/full_text")

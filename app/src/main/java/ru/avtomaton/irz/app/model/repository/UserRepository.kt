@@ -5,10 +5,7 @@ import retrofit2.Response
 import ru.avtomaton.irz.app.activity.util.SearchParams
 import ru.avtomaton.irz.app.client.IrzClient
 import ru.avtomaton.irz.app.model.OpResult
-import ru.avtomaton.irz.app.model.pojo.Position
-import ru.avtomaton.irz.app.model.pojo.User
-import ru.avtomaton.irz.app.model.pojo.UserDto
-import ru.avtomaton.irz.app.model.pojo.UserShort
+import ru.avtomaton.irz.app.model.pojo.*
 import java.util.UUID
 
 /**
@@ -18,6 +15,34 @@ object UserRepository {
 
     private const val threeDots = "…"
     private var me: User? = null
+
+    suspend fun updatePhoto(imageDto: ImageDto): Boolean {
+        return try {
+            val response = IrzClient.usersApi.updatePhoto(imageDto)
+            response.isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun deletePhoto(): Boolean {
+        return try {
+            IrzClient.usersApi.deletePhoto().isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun updateInfo(userInfo: UserInfo): Boolean {
+        return try {
+            IrzClient.usersApi.updateInfo(userInfo).isSuccessful
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            false
+        }
+    }
 
     suspend fun getUsers(searchParams: SearchParams): OpResult<List<UserShort>> {
         return try {

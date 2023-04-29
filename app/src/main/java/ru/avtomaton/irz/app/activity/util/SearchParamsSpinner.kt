@@ -13,43 +13,23 @@ import java.util.UUID
  */
 object SearchParamsSpinner {
 
-    fun Spinner.positionSpinner(positionsMap: HashMap<String, UUID>, positionsList: List<String>, builder: SearchParams.Builder) {
-        val values = mutableListOf("")
-        values.addAll(positionsList)
+    fun Spinner.positionSpinner(
+        positionsMap: HashMap<String, UUID>,
+        positionsList: List<String>,
+        builder: SearchParams.Builder
+    ) {
+        val values = mutableListOf("").apply { addAll(positionsList) }
         this.adapter = createAdapter(context, values)
-        onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                builder.positionId(positionsMap[values[position]])
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
+        onItemSelectedListener = createListener { position ->
+            builder.positionId(positionsMap[values[position]])
         }
     }
 
     fun Spinner.rolesSpinner(roles: List<String>, builder: SearchParams.Builder) {
-        val values = mutableListOf("")
-        values.addAll(roles)
+        val values = mutableListOf("").apply { addAll(roles) }
         this.adapter = createAdapter(context, values)
-        onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if (position == 0) {
-                    builder.role(null)
-                } else {
-                    builder.role(values[position])
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
+        onItemSelectedListener = createListener { position ->
+            if (position == 0) builder.role(null) else builder.role(values[position])
         }
     }
 
@@ -59,4 +39,16 @@ object SearchParamsSpinner {
         }
     }
 
+    private fun createListener(block: (Int) -> Unit): OnItemSelectedListener {
+        return object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) = block(position)
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
 }
