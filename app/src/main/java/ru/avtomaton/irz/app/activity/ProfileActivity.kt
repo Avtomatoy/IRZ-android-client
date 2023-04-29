@@ -260,7 +260,11 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         CAREER_PATH,
     }
 
-    override fun onProfileClick() { } // do nothing
+    override fun onProfileClick() {
+        if (!user.isMe) {
+            super.onProfileClick()
+        }
+    } // do nothing
 
     companion object {
 
