@@ -60,17 +60,15 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
     }
 
     private fun showParamsDialog() {
-        val searchParamsBinding = SearchParamsBinding.inflate(layoutInflater)
-        searchParamsBinding.position.apply {
-            positionSpinner(positionsMap, positionsList, paramsBuilder)
+        SearchParamsBinding.inflate(layoutInflater).apply {
+            position.positionSpinner(positionsMap, positionsList, paramsBuilder)
+            role.rolesSpinner(roles, paramsBuilder)
+
+            AlertDialog.Builder(this@SearchActivity).create().apply {
+                setView(root)
+                setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ -> dismiss() }
+            }.show()
         }
-        searchParamsBinding.role.apply {
-            rolesSpinner(roles, paramsBuilder)
-        }
-        AlertDialog.Builder(this).create().apply {
-            setView(searchParamsBinding.root)
-            setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ -> dismiss() }
-        }.show()
     }
 
     private fun recreateAdapter() {
@@ -91,7 +89,7 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
             }
         }
         val params = paramsBuilder.pageIndex(pageIndex).pageSize(pageSize).build()
-        UserRepository.getUsers(params).applyIfSuccess {
+        UserRepository.getUsers(params).letIfSuccess {
             adapter.updateUsers(this)
         }
     }

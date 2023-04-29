@@ -1,7 +1,12 @@
 package ru.avtomaton.irz.app.activity
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.model.OpResult
 import java.text.SimpleDateFormat
@@ -12,14 +17,38 @@ import java.util.*
  */
 open class AppCompatActivityBase : AppCompatActivity() {
 
-    val tag: String = this.javaClass.simpleName
+    protected val threeDots: String = "…"
+    protected val tag: String = this.javaClass.simpleName
+    private val code: Int = 1488
+    protected lateinit var block: (Uri) -> Unit
 
     companion object {
         val dateFormat: SimpleDateFormat =
             SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale("ru"))
+
+        val dateFormatV2: SimpleDateFormat =
+            SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
     }
 
-    protected fun error() {
+    protected fun uploadImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.data = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        startActivityForResult(intent, code)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != RESULT_OK || requestCode != code || data == null) {
+            return
+        }
+        block(data.data!!)
+    }
+
+    fun async(block: suspend () -> Unit) {
+        this.lifecycleScope.launch { block() }
+    }
+
+    fun error() {
         val onLoadErrorMessage: String = getString(R.string.common_on_load_error)
         Toast.makeText(this, onLoadErrorMessage, Toast.LENGTH_SHORT).show()
     }
@@ -28,11 +57,16 @@ open class AppCompatActivityBase : AppCompatActivity() {
         Toast.makeText(this, value, Toast.LENGTH_SHORT).show()
     }
 
-    protected fun <T> OpResult<T>.applyIfSuccess(block: T.() -> Unit) {
+    fun <T> OpResult<T>.letIfSuccess(block: T.() -> Unit) {
         if (this.isFailure) {
             error()
             return
         }
         block(this.value())
     }
+
+    protected fun String.orEmpty(): String =
+        if (this.isEmpty() || this.isBlank()) threeDots else this
+
+    protected fun String.emptyBlank(): Boolean = this.isEmpty() || this.isBlank()
 }

@@ -24,10 +24,8 @@ import java.util.*
  */
 class NewsActivity :
     NavbarAppCompatActivityBase(),
-    NewsFeedAdapter.NewsFeedAdapterListener,
     SwipeRefreshLayout.OnRefreshListener {
 
-    private val pageSize = 10
     private val postRequestCode = 228
 
     private lateinit var binding: ActivityNewsBinding
@@ -76,7 +74,7 @@ class NewsActivity :
 
     private fun recreateAdapter() {
         newsFeedAdapter = NewsFeedAdapter(this)
-        this.lifecycleScope.launch { updateNews(0, pageSize) }
+//        this.lifecycleScope.launch { updateNews(0, pageSize) }
         binding.newsFeed.apply {
             layoutManager = LinearLayoutManager(this@NewsActivity)
             adapter = newsFeedAdapter
@@ -96,56 +94,6 @@ class NewsActivity :
         recreateAdapter()
         newsRefreshLayout.isRefreshing = false
     }
-
-    // section: NewsFeedAdapter.NewsFeedAdapterListener
-    override fun onNewsUpdate(listSize: Int, position: Int) {
-        if (listSize % pageSize != 0 || listSize - position != 5)
-            return
-        this.lifecycleScope.launch { updateNews(listSize / pageSize, pageSize) }
-    }
-
-    override fun onNewsLike(newsId: UUID, liked: Boolean) {
-        this.lifecycleScope.launch {
-            try {
-                if (liked) {
-                    IrzClient.likesApi.like(newsId)
-                    return@launch
-                }
-                IrzClient.likesApi.dislike(newsId)
-            } catch (ex: Throwable) {
-                ex.printStackTrace()
-            }
-        }
-    }
-
-    override fun onNewsClick(news: News) {
-        if (!CredentialsManager.isAuthenticated()) {
-            return
-        }
-        this.lifecycleScope.launch {
-            val result = NewsRepository.getNewsWithFulltext(news)
-            if (result.isFailure) {
-                error()
-                return@launch
-            }
-            startActivity(CurrentNewsItemActivity.open(this@NewsActivity, result.value()))
-        }
-    }
-
-    override fun onNewsDelete(news: News) {
-        this.lifecycleScope.launch {
-            if (NewsRepository.tryDeleteNews(news.id)) {
-                newsFeedAdapter.deleteNews(news)
-                return@launch
-            }
-            error()
-        }
-    }
-
-    override fun onProfileClick(id: UUID) {
-        startActivity(ProfileActivity.openProfile(this, id))
-    }
-    // end section: NewsFeedAdapter.NewsFeedAdapterListener
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
