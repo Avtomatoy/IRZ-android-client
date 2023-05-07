@@ -13,7 +13,7 @@ import java.net.URL
 /**
  * @author Anton Akkuzin
  */
-class AuthInterceptor : Interceptor {
+object AuthInterceptor : Interceptor {
 
     private val gson: Gson = Gson()
     private val mediaType: MediaType = MediaType.get("application/json; charset=UTF-8")

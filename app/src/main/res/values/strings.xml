@@ -61,7 +61,6 @@
     <string name="auth_activity_sign_in_button_title">Войти</string>
     <string name="auth_activity_forgot_password_title">Забыли пароль?</string>
     <string name="auth_activity_forgot_password_message">Укажите почту, мы вышлем вам ссылку для восстановления пароля</string>
-
     <string name="auth_activity_forgot_password_missing_email">Укажите почту!</string>
     <string name="auth_activity_forgot_password_success">Мы выслали информацию на почту</string>
     <string name="auth_activity_forgot_password_fail">Не удалось отправить информацию на почту…</string>
@@ -86,4 +85,25 @@
     <string name="profile_activity_about_news_button">Новости</string>
     <string name="profile_activity_about_career_path_button">Карьерный путь</string>
     <!--  profile_activity  -->
+
+    <!--  messenger_activity  -->
+    <string name="messenger_activity_name">Мессенджер</string>
+    <string name="messenger_activity_chat_item_user_name">Нечаев Сергей Анатольевич</string>
+    <string name="messenger_activity_chat_item_last_message">Какое-то супер-интересное длинное сообщение, вот ещё немного информации, теперь наверно достаточно</string>
+    <string name="messenger_activity_chat_item_last_message_date">13:37, 16.02.2001</string>
+    <!--  messenger_activity  -->
+
+    <!--  chat_activity  -->
+    <string name="chat_activity_message_hint">Сообщение</string>
+    <string name="chat_activity_seach_message_hint">Поиск</string>
+    <!--  chat_activity  -->
+
+    <!--  news_activity  -->
+    <string name="news_activity_search_params_name">Поиск</string>
+    <string name="news_activity_search_string_hint">На нашем заводе…</string>
+    <string name="news_activity_search_author_name">Автор</string>
+    <string name="news_activity_search_public_switch_name">Публичная новость </string>
+    <string name="news_activity_search_liked_switch_name">Только понравившиеся </string>
+    <!--  news_activity  -->
+
 </resources>

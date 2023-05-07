@@ -27,7 +27,7 @@ class NewsFeedAdapter(
     private val pageSize = 10
 
     init {
-        context.async { updateNews(0, pageSize) }
+        context.async { updateNews(0) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
@@ -41,17 +41,10 @@ class NewsFeedAdapter(
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bindNews(news[position])
         holder.itemView.setOnClickListener { context.async { onNewsClick(holder.getNews()) } }
-        onNewsUpdate(itemCount, position)
+        onNewsUpdate(position)
     }
 
-    fun updateNews(news: List<News>) {
-        news.forEach {
-            this.news.add(it)
-            notifyItemInserted(this.news.size - 1)
-        }
-    }
-
-    private suspend fun updateNews(pageIndex: Int, pageSize: Int) {
+    private suspend fun updateNews(pageIndex: Int) {
         val result = if (userId == null)
             NewsRepository.getNews(pageIndex, pageSize)
         else
@@ -66,10 +59,10 @@ class NewsFeedAdapter(
         }
     }
 
-    private fun onNewsUpdate(listSize: Int, position: Int) {
-        if (listSize % pageSize != 0 || listSize - position != 5)
+    private fun onNewsUpdate(position: Int) {
+        if (itemCount % pageSize != 0 || itemCount - position != 5)
             return
-        context.async { updateNews(listSize / pageSize, pageSize) }
+        context.async { updateNews(itemCount / pageSize) }
     }
 
     private suspend fun onNewsClick(news: News) {

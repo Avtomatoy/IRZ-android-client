@@ -2,8 +2,8 @@ package ru.avtomaton.irz.app.model.repository
 
 import android.graphics.Bitmap
 import retrofit2.Response
-import ru.avtomaton.irz.app.activity.util.SearchParams
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.activity.util.UserSearchParams
+import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.*
 import java.util.UUID
@@ -18,7 +18,7 @@ object UserRepository {
 
     suspend fun updatePhoto(imageDto: ImageDto): Boolean {
         return try {
-            val response = IrzClient.usersApi.updatePhoto(imageDto)
+            val response = IrzHttpClient.usersApi.updatePhoto(imageDto)
             response.isSuccessful
         } catch (ex: Throwable) {
             ex.printStackTrace()
@@ -28,7 +28,7 @@ object UserRepository {
 
     suspend fun deletePhoto(): Boolean {
         return try {
-            IrzClient.usersApi.deletePhoto().isSuccessful
+            IrzHttpClient.usersApi.deletePhoto().isSuccessful
         } catch (ex: Throwable) {
             ex.printStackTrace()
             false
@@ -37,21 +37,21 @@ object UserRepository {
 
     suspend fun updateInfo(userInfo: UserInfo): Boolean {
         return try {
-            IrzClient.usersApi.updateInfo(userInfo).isSuccessful
+            IrzHttpClient.usersApi.updateInfo(userInfo).isSuccessful
         } catch (ex: Throwable) {
             ex.printStackTrace()
             false
         }
     }
 
-    suspend fun getUsers(searchParams: SearchParams): OpResult<List<UserShort>> {
+    suspend fun getUsers(userSearchParams: UserSearchParams): OpResult<List<UserShort>> {
         return try {
-            val response = IrzClient.usersApi.getUsers(
-                searchParams.positionId,
-                searchParams.role,
-                searchParams.searchString,
-                searchParams.pageIndex,
-                searchParams.pageSize
+            val response = IrzHttpClient.usersApi.getUsers(
+                userSearchParams.positionId,
+                userSearchParams.role,
+                userSearchParams.searchString,
+                userSearchParams.pageIndex,
+                userSearchParams.pageSize
             )
             if (!response.isSuccessful) {
                 return OpResult.Failure()
@@ -77,7 +77,7 @@ object UserRepository {
             return OpResult.Success(me!!)
         }
         val user = getAnyUser(
-            { IrzClient.usersApi.getMe() },
+            { IrzHttpClient.usersApi.getMe() },
             { UserPositionsRepository.getMyPositions() }
         )
         if (user.isOk) {
@@ -88,7 +88,7 @@ object UserRepository {
 
     suspend fun getUser(id: UUID): OpResult<User> {
         return getAnyUser(
-            { IrzClient.usersApi.user(id) },
+            { IrzHttpClient.usersApi.user(id) },
             { UserPositionsRepository.getUserPositions(id) }
         )
     }
@@ -113,24 +113,25 @@ object UserRepository {
         }
     }
 
-    private suspend fun convert(userDto: UserDto, positions: List<Position>): User {
-        val isMe = getMyId()?.equals(userDto.id) ?: false
+    private suspend fun convert(dto: UserDto, positions: List<Position>): User {
+        val isMe = getMyId()?.equals(dto.id) ?: false
         return User(
-            userDto.id,
-            userDto.firstName,
-            userDto.surname,
-            userDto.patronymic.orEmpty(),
-            userDto.birthday,
-            getImage(userDto.imageId),
-            userDto.aboutMyself ?: threeDots,
-            userDto.myDoings ?: threeDots,
-            userDto.skills ?: threeDots,
-            userDto.subscribersCount,
-            userDto.subscriptionsCount,
-            userDto.isSubscription,
-            userDto.email,
-            userDto.isActiveAccount,
-            userDto.roles,
+            dto.id,
+            dto.firstName,
+            dto.surname,
+            dto.patronymic.orEmpty(),
+            "${dto.surname} ${dto.firstName}${if (dto.patronymic == null) "" else " ${dto.patronymic}"}",
+            dto.birthday,
+            getImage(dto.imageId),
+            dto.aboutMyself ?: threeDots,
+            dto.myDoings ?: threeDots,
+            dto.skills ?: threeDots,
+            dto.subscribersCount,
+            dto.subscriptionsCount,
+            dto.isSubscription,
+            dto.email,
+            dto.isActiveAccount,
+            dto.roles,
             positions,
             isMe
         )
@@ -138,7 +139,7 @@ object UserRepository {
 
     private suspend fun getMyId(): UUID? {
         return try {
-            val response = IrzClient.usersApi.getMe()
+            val response = IrzHttpClient.usersApi.getMe()
             if (response.isSuccessful) response.body()!!.id else null
         } catch (ex: Throwable) {
             ex.printStackTrace()

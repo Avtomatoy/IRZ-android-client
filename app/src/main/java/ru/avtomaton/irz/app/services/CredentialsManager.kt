@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.pojo.Credentials
 import ru.avtomaton.irz.app.model.pojo.JwtTokens
 import java.util.concurrent.atomic.AtomicReference
@@ -49,7 +49,7 @@ object CredentialsManager {
     }
 
     suspend fun login(credentials: Credentials): Boolean {
-        val response = IrzClient.authApi.authenticate(credentials)
+        val response = IrzHttpClient.authApi.authenticate(credentials)
         authenticated = response.isSuccessful
         saveCredentials(credentials)
         return response.isSuccessful

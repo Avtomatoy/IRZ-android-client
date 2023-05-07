@@ -2,7 +2,7 @@ package ru.avtomaton.irz.app.model.repository
 
 import android.graphics.Bitmap
 import retrofit2.Response
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.UserShort
 import ru.avtomaton.irz.app.model.pojo.News
@@ -18,7 +18,7 @@ object NewsRepository {
 
     suspend fun tryLikeNews(newsId: UUID): Boolean {
         return try {
-            IrzClient.likesApi.like(newsId).isSuccessful
+            IrzHttpClient.likesApi.like(newsId).isSuccessful
         } catch (ex: Throwable) {
             ex.printStackTrace()
             false
@@ -27,7 +27,7 @@ object NewsRepository {
 
     suspend fun tryDislikeNews(newsId: UUID): Boolean {
         return try {
-            IrzClient.likesApi.dislike(newsId).isSuccessful
+            IrzHttpClient.likesApi.dislike(newsId).isSuccessful
         } catch (ex: Throwable) {
             ex.printStackTrace()
             false
@@ -36,7 +36,7 @@ object NewsRepository {
 
     suspend fun tryDeleteNews(newsId: UUID): Boolean {
         return try {
-            val response = IrzClient.newsApi.deleteNews(newsId)
+            val response = IrzHttpClient.newsApi.deleteNews(newsId)
             response.isSuccessful
         } catch (ex: Throwable) {
             ex.printStackTrace()
@@ -46,7 +46,7 @@ object NewsRepository {
 
     private suspend fun getNewsFullText(id: UUID): String? {
         return try {
-            val response = IrzClient.newsApi.getNewsFullText(id)
+            val response = IrzHttpClient.newsApi.getNewsFullText(id)
             if (!response.isSuccessful) {
                 return null
             }
@@ -79,14 +79,14 @@ object NewsRepository {
         pageIndex: Int,
         pageSize: Int
     ): OpResult<List<News>> {
-        return getAnyNews { IrzClient.newsApi.getNews(userId, pageIndex, pageSize) }
+        return getAnyNews { IrzHttpClient.newsApi.getNews(userId, pageIndex, pageSize) }
     }
 
     suspend fun getNews(
         pageIndex: Int,
         pageSize: Int
     ): OpResult<List<News>> {
-        return getAnyNews { IrzClient.newsApi.getNews(null, pageIndex, pageSize) }
+        return getAnyNews { IrzHttpClient.newsApi.getNews(null, pageIndex, pageSize) }
     }
 
     private suspend fun getAnyNews(block: suspend () -> Response<List<NewsDto>>)
