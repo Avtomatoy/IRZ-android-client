@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.pojo.ImageDto
 import ru.avtomaton.irz.app.model.pojo.NewsBody
 import ru.avtomaton.irz.app.model.repository.UserRepository
@@ -44,7 +44,7 @@ class PostNewsActivity : AppCompatActivityBase() {
         binding.publicNewsSwitch.visibility = View.GONE
         tryEnableSwitch()
 
-        block = { uri ->
+        onImageUploaded = { uri ->
             binding.newsImage.setImageURI(uri)
             binding.addImageButton.visibility = View.GONE
             binding.removeImageButton.visibility = View.VISIBLE
@@ -92,7 +92,7 @@ class PostNewsActivity : AppCompatActivityBase() {
             val newsBody = NewsBody(title, text, binding.publicNewsSwitch.isChecked, imageDto)
             val response: Response<Unit>
             try {
-                response = IrzClient.newsApi.postNews(newsBody)
+                response = IrzHttpClient.newsApi.postNews(newsBody)
             } catch (ex: Throwable) {
                 ex.printStackTrace()
                 warn(errorOnPost)

@@ -6,6 +6,7 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import ru.avtomaton.irz.app.model.pojo.User
 import java.util.UUID
 
 /**
@@ -16,20 +17,31 @@ object SearchParamsSpinner {
     fun Spinner.positionSpinner(
         positionsMap: HashMap<String, UUID>,
         positionsList: List<String>,
-        builder: SearchParams.Builder
+        builder: UserSearchParams.Builder
     ) {
         val values = mutableListOf("").apply { addAll(positionsList) }
         this.adapter = createAdapter(context, values)
         onItemSelectedListener = createListener { position ->
-            builder.positionId(positionsMap[values[position]])
+            builder.positionId = positionsMap[values[position]]
         }
     }
 
-    fun Spinner.rolesSpinner(roles: List<String>, builder: SearchParams.Builder) {
+    fun Spinner.rolesSpinner(roles: List<String>, builder: UserSearchParams.Builder) {
         val values = mutableListOf("").apply { addAll(roles) }
         this.adapter = createAdapter(context, values)
         onItemSelectedListener = createListener { position ->
-            if (position == 0) builder.role(null) else builder.role(values[position])
+            builder.role = if (position == 0) null else values[position]
+        }
+    }
+
+    fun Spinner.userSpinner(users: List<User>, builder: NewsSearchParams.Builder) {
+        val map = HashMap<String, UUID>()
+        users.forEach { map[it.fullName] = it.id }
+        val values =
+            mutableListOf("").apply { addAll(users.sortedBy { it.fullName }.map { it.fullName }) }
+        this.adapter = createAdapter(context, values)
+        onItemSelectedListener = createListener { position ->
+            builder.authorId = map[values[position]]
         }
     }
 

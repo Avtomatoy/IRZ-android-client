@@ -24,6 +24,7 @@ import ru.avtomaton.irz.app.databinding.CareerPathElementBinding
 import ru.avtomaton.irz.app.databinding.ChangeUserInfoBinding
 import ru.avtomaton.irz.app.model.pojo.ImageDto
 import ru.avtomaton.irz.app.model.pojo.UserInfo
+import ru.avtomaton.irz.app.model.repository.MessengerRepository
 import ru.avtomaton.irz.app.model.repository.SubscriptionsRepository
 import ru.avtomaton.irz.app.services.Base64Converter
 import ru.avtomaton.irz.app.services.CredentialsManager
@@ -40,7 +41,6 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
     private lateinit var selectedColor: ColorStateList
     private lateinit var nonSelectedColor: ColorStateList
     private var isSubscription: Boolean = false
-
 
     private lateinit var emptyFields: String
     private lateinit var imageLoadError: String
@@ -65,6 +65,7 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
             profileEditButton.setOnClickListener {
                 ChangeUserInfoBinding.inflate(layoutInflater).showDialog()
             }
+            profileMessageButton.setOnClickListener { async { openChat() } }
             aboutMyselfButton.setOnClickListener { sectionClick(Section.INFO) }
             profileNewsButton.setOnClickListener { sectionClick(Section.NEWS) }
             careerPathButton.setOnClickListener { sectionClick(Section.CAREER_PATH) }
@@ -147,8 +148,12 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
             profileActionButton.setOnClickListener {
                 async { this@ProfileActivity.onSubscribe() }
             }
-            profileEditButton.visibility = View.GONE
             setSubscriptionBackground()
+            profileEditButton.visibility = View.GONE
+            profileMessageButton.visibility = View.VISIBLE
+        } else {
+            profileEditButton.visibility = View.VISIBLE
+            profileMessageButton.visibility = View.GONE
         }
         user = currentUser
         sectionMain.visibility = View.VISIBLE
@@ -171,7 +176,7 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         if (user.image != null) {
             image.setImageBitmap(user.image)
         }
-        block = { uri ->
+        onImageUploaded = { uri ->
             run {
                 this.image.setImageURI(uri)
                 imageModified = true
@@ -254,6 +259,22 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         }
     }
 
+    private suspend fun openChat() {
+        val me = UserRepository.getMe()
+        if (me.isFailure) {
+            error()
+            return
+        }
+        MessengerRepository.getChatFor(user.id).letIfSuccess {
+            val intent = ChatActivity.open(
+                this@ProfileActivity,
+                this,
+                me.value().id, user.id
+            )
+            startActivity(intent)
+        }
+    }
+
     private enum class Section {
         INFO,
         NEWS,
@@ -264,7 +285,8 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         if (!user.isMe) {
             super.onProfileClick()
         }
-    } // do nothing
+        // or do nothing
+    }
 
     companion object {
 

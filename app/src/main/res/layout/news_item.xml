@@ -37,13 +37,17 @@
                     android:scrollHorizontally="false"
                     android:textSize="24sp"
                     />
-                <Button
+
+                <ImageView
                     android:id="@+id/delete_button"
                     android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/Pantone_187_C"
-                    android:text="X"
-                    />
+                    android:layout_height="40dp"
+                    android:adjustViewBounds="true"
+                    android:background="@color/Pantone_187_C"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/remove"
+                    android:contentDescription="TODO" />
             </LinearLayout>
 
             <LinearLayout

@@ -1,6 +1,6 @@
 package ru.avtomaton.irz.app.model.repository
 
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.PositionInfo
 import java.util.UUID
@@ -12,7 +12,7 @@ object PositionRepository {
 
     suspend fun getPositions(): OpResult<HashMap<String, UUID>> {
         return try {
-            val response = IrzClient.positionsApi.getPositions(0, 100)
+            val response = IrzHttpClient.positionsApi.getPositions(0, 100)
             if (!response.isSuccessful) {
                 return OpResult.Failure()
             }

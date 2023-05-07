@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import ru.avtomaton.irz.app.activity.util.SearchParams
+import ru.avtomaton.irz.app.activity.util.UserSearchParams
 import ru.avtomaton.irz.app.activity.util.SearchParamsSpinner.positionSpinner
 import ru.avtomaton.irz.app.activity.util.SearchParamsSpinner.rolesSpinner
 import ru.avtomaton.irz.app.activity.util.SearchUsersAdapter
@@ -24,7 +24,7 @@ import java.util.UUID
 class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listener {
 
     private val pageSize = 20
-    private val paramsBuilder: SearchParams.Builder = SearchParams.Builder()
+    private val paramsBuilder: UserSearchParams.Builder = UserSearchParams.Builder()
 
     private lateinit var binding: ActivitySearchBinding
     private lateinit var adapter: SearchUsersAdapter
@@ -46,12 +46,12 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
         binding.eventsButton.setOnClickListener { onEventsClick() }
         binding.profileButton.setOnClickListener { onProfileClick() }
 
-        this.lifecycleScope.launch {
+        async {
             val positionsResult = PositionRepository.getPositions()
             if (positionsResult.isFailure) {
                 error()
                 finish()
-                return@launch
+                return@async
             }
             positionsMap = positionsResult.value()
             positionsList = positionsResult.value().keys.toList()
@@ -83,12 +83,16 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
     private suspend fun updateUsers(pageIndex: Int, pageSize: Int) {
         binding.userInput.query.toString().apply {
             if (this.isNotEmpty() && this.isNotBlank()) {
-                paramsBuilder.searchString(this)
+                paramsBuilder.searchString = this
             } else {
-                paramsBuilder.searchString(null)
+                paramsBuilder.searchString = null
             }
         }
-        val params = paramsBuilder.pageIndex(pageIndex).pageSize(pageSize).build()
+        val params = paramsBuilder.let {
+            it.pageIndex = pageIndex
+            it.pageSize = pageSize
+            it.build()
+        }
         UserRepository.getUsers(params).letIfSuccess {
             adapter.updateUsers(this)
         }
@@ -103,6 +107,10 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
             return
         }
         this.lifecycleScope.launch { updateUsers(listSize / pageSize, pageSize) }
+    }
+
+    override fun onSearchClick() {
+        // do nothing
     }
 
     companion object {

@@ -20,11 +20,11 @@ open class AppCompatActivityBase : AppCompatActivity() {
     protected val threeDots: String = "…"
     protected val tag: String = this.javaClass.simpleName
     private val code: Int = 1488
-    protected lateinit var block: (Uri) -> Unit
+    protected lateinit var onImageUploaded: (Uri) -> Unit
 
     companion object {
         val dateFormat: SimpleDateFormat =
-            SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale("ru"))
+            SimpleDateFormat("HH:mm, dd.MM.yyyy", Locale("ru"))
 
         val dateFormatV2: SimpleDateFormat =
             SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
@@ -33,15 +33,18 @@ open class AppCompatActivityBase : AppCompatActivity() {
     protected fun uploadImage() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.data = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        @Suppress("DEPRECATION")
         startActivityForResult(intent, code)
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != RESULT_OK || requestCode != code || data == null) {
             return
         }
-        block(data.data!!)
+        onImageUploaded(data.data!!)
     }
 
     fun async(block: suspend () -> Unit) {

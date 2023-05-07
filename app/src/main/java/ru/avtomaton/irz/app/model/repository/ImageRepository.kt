@@ -1,7 +1,7 @@
 package ru.avtomaton.irz.app.model.repository
 
 import android.graphics.Bitmap
-import ru.avtomaton.irz.app.client.IrzClient
+import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.services.Base64Converter
 import java.util.*
@@ -21,7 +21,7 @@ object ImageRepository {
 
     private suspend fun downloadImage(imageId: UUID): OpResult<Bitmap> {
         return try {
-            val response = IrzClient.imagesApi.getImage(imageId)
+            val response = IrzHttpClient.imagesApi.getImage(imageId)
             if (!response.isSuccessful) {
                 return OpResult.Failure()
             }

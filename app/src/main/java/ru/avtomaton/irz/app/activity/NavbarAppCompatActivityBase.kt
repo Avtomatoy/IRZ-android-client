@@ -10,7 +10,7 @@ open class NavbarAppCompatActivityBase: AppCompatActivityBase(), NavbarListener 
     }
 
     override fun onMessengerClick() {
-        TODO("Not yet implemented")
+        startActivity(MessengerActivity.open(this))
     }
 
     override fun onSearchClick() {

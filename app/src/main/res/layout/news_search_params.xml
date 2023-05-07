@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/user_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:backgroundTint="@color/Cool_Grey_3"
+    android:orientation="vertical"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="7dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:gravity="center"
+            android:text="@string/news_activity_search_params_name"
+            android:textColor="@color/Pantone_295_C"
+            android:textSize="20sp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:autofillHints=""
+            android:fontFamily="@font/montserrat"
+            android:gravity="start"
+            android:hint="@string/news_activity_search_string_hint"
+            android:inputType="text"
+            android:textColor="@color/Pantone_295_C"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/authorized_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="start"
+                android:text="@string/news_activity_search_author_name"
+                android:textColor="@color/Pantone_295_C"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/author"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="5dp"
+                android:spinnerMode="dropdown" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/is_public"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:checked="false"
+                android:fontFamily="@font/montserrat"
+                android:text="@string/news_activity_search_public_switch_name"
+                android:textColor="@color/Pantone_295_C"
+                android:textOff="@string/disable_public_news"
+                android:textOn="@string/enable_public_news"
+                android:textSize="20sp"
+                app:showText="true" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/is_liked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:checked="false"
+                android:fontFamily="@font/montserrat"
+                android:text="@string/news_activity_search_liked_switch_name"
+                android:textColor="@color/Pantone_295_C"
+                android:textOff="@string/disable_public_news"
+                android:textOn="@string/enable_public_news"
+                android:textSize="20sp"
+                app:showText="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

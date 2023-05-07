@@ -11,6 +11,7 @@ data class User(
     val firstName: String,
     val surname: String,
     val patronymic: String,
+    val fullName: String,
     val birthday: Date,
     val image: Bitmap?,
     val aboutMyself: String,
