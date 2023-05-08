@@ -7,6 +7,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import ru.avtomaton.irz.app.model.pojo.User
+import ru.avtomaton.irz.app.model.pojo.UserShort
 import java.util.UUID
 
 /**
@@ -34,7 +35,7 @@ object SearchParamsSpinner {
         }
     }
 
-    fun Spinner.userSpinner(users: List<User>, builder: NewsSearchParams.Builder) {
+    fun Spinner.userSpinner(users: List<UserShort>, builder: NewsSearchParams.Builder) {
         val map = HashMap<String, UUID>()
         users.forEach { map[it.fullName] = it.id }
         val values =

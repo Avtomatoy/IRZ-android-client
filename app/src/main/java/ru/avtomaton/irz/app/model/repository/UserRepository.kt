@@ -62,6 +62,7 @@ object UserRepository {
                     it.firstName,
                     it.surname,
                     it.patronymic.orEmpty(),
+                    "${it.surname} ${it.firstName}${if (it.patronymic == null) "" else " ${it.patronymic}"}",
                     getImage(it.imageId)
                 )
             }.toList()

@@ -106,4 +106,8 @@
     <string name="news_activity_search_liked_switch_name">Только понравившиеся </string>
     <!--  news_activity  -->
 
+    <!--  current_news_item_activity  -->
+    <string name="current_news_item_acitivity_commentary_hint">Комментарий</string>
+    <!--  current_news_item_activity  -->
+
 </resources>

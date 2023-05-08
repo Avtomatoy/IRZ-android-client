@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -49,8 +49,7 @@
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:src="@drawable/nevexal"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
-                            />
+                            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent" />
 
                         <TextView
                             android:id="@+id/news_author_name"
@@ -67,19 +66,19 @@
                         android:id="@+id/news_datetime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/Pantone_295_C"
-                        android:textAlignment="textEnd"
                         android:layout_marginBottom="5dp"
-                        android:text="@string/news_datetime_placeholder" />
+                        android:text="@string/news_datetime_placeholder"
+                        android:textAlignment="textEnd"
+                        android:textColor="@color/Pantone_295_C" />
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/news_image"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/news_image_description"
                         android:adjustViewBounds="true"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize5Percent"
-                        android:src="@drawable/nevexal" />
+                        android:contentDescription="@string/news_image_description"
+                        android:src="@drawable/nevexal"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize5Percent" />
 
                     <TextView
                         android:id="@+id/news_text"
@@ -93,6 +92,40 @@
 
             </androidx.cardview.widget.CardView>
 
+            <LinearLayout
+                android:id="@+id/comments_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <EditText
+                    android:id="@+id/input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".80"
+                    android:hint="@string/current_news_item_acitivity_commentary_hint"
+                    android:inputType="text" />
+
+                <ImageView
+                    android:id="@+id/post_comment_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:adjustViewBounds="true"
+                    android:background="@color/Pantone_289_C"
+                    android:contentDescription="TODO"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/message_button" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/input_area"
+                app:layout_constraintTop_toBottomOf="@id/search_area" />
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

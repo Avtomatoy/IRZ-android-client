@@ -1,20 +1,48 @@
 package ru.avtomaton.irz.app.model.repository
 
 import android.graphics.Bitmap
-import retrofit2.Response
+import ru.avtomaton.irz.app.activity.util.NewsSearchParams
 import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
-import ru.avtomaton.irz.app.model.pojo.UserShort
-import ru.avtomaton.irz.app.model.pojo.News
-import ru.avtomaton.irz.app.model.pojo.NewsDto
-import ru.avtomaton.irz.app.model.pojo.User
+import ru.avtomaton.irz.app.model.pojo.*
 import java.util.UUID
 import java.util.function.Predicate
 
 /**
  * @author Anton Akkuzin
  */
-object NewsRepository {
+object NewsRepository : Repository() {
+
+    suspend fun getComments(id: UUID, pageIndex: Int, pageSize: Int): OpResult<List<Comment>> {
+        return tryForResult {
+            val response = IrzHttpClient.newsApi.getComments(id, pageIndex, pageSize)
+            if (!response.isSuccessful) {
+                return@tryForResult OpResult.Failure()
+            }
+            val me = UserRepository.getMe()
+            if (me.isFailure) {
+                return@tryForResult OpResult.Failure()
+            }
+            val list = response.body()!!.map { convert(it) { id -> me.value().id == id } }.toList()
+            OpResult.Success(list)
+        }
+    }
+
+    suspend fun postComment(comment: CommentToSend): OpResult<Comment> {
+        return tryForResult {
+            val response = IrzHttpClient.newsApi.postComment(comment)
+            if (!response.isSuccessful) {
+                return@tryForResult OpResult.Failure()
+            }
+            OpResult.Success(convert(response.body()!!) { true })
+        }
+    }
+
+    suspend fun deleteComment(id: UUID): Boolean {
+        return tryForSuccess {
+            IrzHttpClient.newsApi.deleteComment(id).isSuccessful
+        }
+    }
 
     suspend fun tryLikeNews(newsId: UUID): Boolean {
         return try {
@@ -26,21 +54,14 @@ object NewsRepository {
     }
 
     suspend fun tryDislikeNews(newsId: UUID): Boolean {
-        return try {
+        return tryForSuccess {
             IrzHttpClient.likesApi.dislike(newsId).isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
         }
     }
 
     suspend fun tryDeleteNews(newsId: UUID): Boolean {
-        return try {
-            val response = IrzHttpClient.newsApi.deleteNews(newsId)
-            response.isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
+        return tryForSuccess {
+            IrzHttpClient.newsApi.deleteNews(newsId).isSuccessful
         }
     }
 
@@ -74,36 +95,23 @@ object NewsRepository {
         return OpResult.Success(value)
     }
 
-    suspend fun getAuthorNews(
-        userId: UUID,
-        pageIndex: Int,
-        pageSize: Int
-    ): OpResult<List<News>> {
-        return getAnyNews { IrzHttpClient.newsApi.getNews(userId, pageIndex, pageSize) }
-    }
-
-    suspend fun getNews(
-        pageIndex: Int,
-        pageSize: Int
-    ): OpResult<List<News>> {
-        return getAnyNews { IrzHttpClient.newsApi.getNews(null, pageIndex, pageSize) }
-    }
-
-    private suspend fun getAnyNews(block: suspend () -> Response<List<NewsDto>>)
-            : OpResult<List<News>> {
-        return try {
-            val newsResponse = block()
+    suspend fun getNews(params: NewsSearchParams): OpResult<List<News>> {
+        return tryForResult {
+            val newsResponse = IrzHttpClient.newsApi.getNews(
+                params.authorId,
+                params.publicOnly,
+                params.likedOnly,
+                params.pageIndex,
+                params.pageSize
+            )
             val newsObserver = UserRepository.getMe()
             if (!newsResponse.isSuccessful) {
-                return OpResult.Failure()
+                return@tryForResult OpResult.Failure()
             }
             val newsList = newsResponse.body()!!
                 .map { it -> mapNewsDto(it) { canDelete(it, newsObserver) } }
                 .toList()
             OpResult.Success(newsList)
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            OpResult.Failure()
         }
     }
 
@@ -128,6 +136,7 @@ object NewsRepository {
         dto: NewsDto,
         newsImage: Bitmap?, authorImage: Bitmap?, canDelete: Boolean
     ): News {
+        val author = dto.authorDto
         return News(
             dto.id,
             dto.title,
@@ -141,10 +150,29 @@ object NewsRepository {
                 dto.authorDto.firstName,
                 dto.authorDto.surname,
                 dto.authorDto.patronymic,
+                "${author.surname} ${author.firstName} ${author.patronymic}}",
                 authorImage
             ),
             dto.commentCount,
             canDelete
+        )
+    }
+
+    private suspend fun convert(dto: CommentDto, canDelete: Predicate<UUID>): Comment {
+        val user = dto.user
+        return Comment(
+            dto.id,
+            dto.text,
+            dto.dateTime,
+            UserShort(
+                user.id,
+                user.firstName,
+                user.surname,
+                user.patronymic,
+                "${user.surname} ${user.firstName}",
+                getImage(user.imageId)
+            ),
+            canDelete.test(user.id)
         )
     }
 

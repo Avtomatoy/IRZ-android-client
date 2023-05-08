@@ -1,5 +1,6 @@
 package ru.avtomaton.irz.app.activity
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,7 +12,12 @@ import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.DoNothingBackPressedCallback
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
 import ru.avtomaton.irz.app.activity.util.NewsSearchParams
+import ru.avtomaton.irz.app.activity.util.SearchParamsSpinner.userSpinner
+import ru.avtomaton.irz.app.activity.util.UserSearchParams
 import ru.avtomaton.irz.app.databinding.ActivityNewsBinding
+import ru.avtomaton.irz.app.databinding.NewsSearchParamsBinding
+import ru.avtomaton.irz.app.model.pojo.UserShort
+import ru.avtomaton.irz.app.model.repository.UserRepository
 import ru.avtomaton.irz.app.services.CredentialsManager
 
 /**
@@ -22,12 +28,21 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
     private val postRequestCode = 228
 
     private lateinit var binding: ActivityNewsBinding
+    private lateinit var authors: List<UserShort>
     private val builder: NewsSearchParams.Builder = NewsSearchParams.Builder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(DoNothingBackPressedCallback())
-
+        if (CredentialsManager.isAuthenticated()) {
+            async {
+                UserRepository.getUsers(
+                    UserSearchParams.Builder()
+                        .apply { pageSize = 100 }.build()
+                )
+                    .letIfSuccess { authors = this }
+            }
+        }
         binding = ActivityNewsBinding.inflate(layoutInflater).apply {
             newsRefreshLayout.setOnRefreshListener(this@NewsActivity)
             newsButton.setOnClickListener { onNewsClick() }
@@ -36,6 +51,7 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
             eventsButton.setOnClickListener { onEventsClick() }
             profileButton.setOnClickListener { onProfileClick() }
             newsActivityName.setOnClickListener { scrollToActivityTop() }
+            searchParamsButton.setOnClickListener { searchDialog() }
             writeNewsButton.setOnClickListener {
                 @Suppress("DEPRECATION") startActivityForResult(
                     PostNewsActivity.open(this@NewsActivity), postRequestCode
@@ -55,19 +71,52 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
             searchButton.isClickable = false
             eventsButton.isClickable = false
         }
-        recreateAdapter()
         setContentView(binding.root)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        recreateAdapter()
     }
 
     private fun scrollToActivityTop() {
         binding.newsFeed
-        val scrollToPosition = binding.newsFeed.scrollToPosition(0)
+        binding.newsFeed.scrollToPosition(0)
     }
 
     private fun recreateAdapter() {
         binding.newsFeed.apply {
             layoutManager = LinearLayoutManager(this@NewsActivity)
-            adapter = NewsFeedAdapter(this@NewsActivity)
+            adapter = NewsFeedAdapter(this@NewsActivity, builder)
+        }
+    }
+
+    private fun searchDialog() {
+        NewsSearchParamsBinding.inflate(layoutInflater).apply {
+            if (CredentialsManager.isAuthenticated()) {
+                author.userSpinner(authors, builder)
+            } else {
+                authorizedArea.visibility = View.GONE
+            }
+            AlertDialog.Builder(this@NewsActivity).create().apply {
+                setView(root)
+                setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ ->
+                    builder.publicOnly = isPublic.isChecked
+                    builder.likedOnly = isLiked.isChecked
+                    builder.searchString = searchInput.text.toString().let {
+                        it.ifBlank { null }
+                    }
+                    recreateAdapter()
+                }
+                setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена") { _, _ ->
+                    builder.apply {
+                        authorId = null
+                        publicOnly = false
+                        likedOnly = false
+                        searchString = null
+                    }
+                }
+            }.show()
         }
     }
 

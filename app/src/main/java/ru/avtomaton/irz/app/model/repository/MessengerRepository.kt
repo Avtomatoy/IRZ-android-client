@@ -92,6 +92,7 @@ object MessengerRepository : Repository() {
             dto.firstName,
             dto.surname,
             dto.patronymic,
+            "${dto.surname} ${dto.firstName} ${dto.patronymic}}",
             getImage(dto.imageId)
         )
 
