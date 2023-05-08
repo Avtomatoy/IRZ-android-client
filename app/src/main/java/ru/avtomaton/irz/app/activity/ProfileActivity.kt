@@ -16,6 +16,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
+import ru.avtomaton.irz.app.activity.util.NewsSearchParams
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.repository.UserRepository
 import ru.avtomaton.irz.app.model.pojo.User
@@ -89,7 +90,9 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         careerPathElements.bindCareerPath()
         newsFeed.apply {
             layoutManager = LinearLayoutManager(this@ProfileActivity)
-            adapter = NewsFeedAdapter(this@ProfileActivity, user.id)
+            adapter = NewsFeedAdapter(
+                this@ProfileActivity,
+                NewsSearchParams.Builder().apply { authorId = user.id })
         }
         aboutMyself.visibility = View.VISIBLE
     }

@@ -19,7 +19,7 @@ import java.util.*
  */
 class NewsFeedAdapter(
     private val context: AppCompatActivityBase,
-    private val userId: UUID? = null
+    private val paramsBuilder: NewsSearchParams.Builder
 ) :
     RecyclerView.Adapter<NewsFeedAdapter.NewsViewHolder>() {
 
@@ -45,10 +45,11 @@ class NewsFeedAdapter(
     }
 
     private suspend fun updateNews(pageIndex: Int) {
-        val result = if (userId == null)
-            NewsRepository.getNews(pageIndex, pageSize)
-        else
-            NewsRepository.getAuthorNews(userId, pageIndex, pageSize)
+        val result = NewsRepository.getNews(paramsBuilder.let {
+            it.pageIndex = pageIndex
+            it.pageSize = pageSize
+            it.build()
+        })
         if (result.isFailure) {
             context.error()
             return
@@ -66,9 +67,6 @@ class NewsFeedAdapter(
     }
 
     private suspend fun onNewsClick(news: News) {
-        if (!CredentialsManager.isAuthenticated()) {
-            return
-        }
         val result = NewsRepository.getNewsWithFulltext(news)
         if (result.isFailure) {
             context.error()

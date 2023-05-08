@@ -1,11 +1,17 @@
 package ru.avtomaton.irz.app.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import ru.avtomaton.irz.app.activity.util.CommentsAdapter
 import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.databinding.ActivityCurrentNewsItemBinding
+import ru.avtomaton.irz.app.model.pojo.CommentToSend
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
@@ -31,24 +37,55 @@ class CurrentNewsItemActivity : AppCompatActivityBase() {
         }
     }
 
+    private lateinit var binding: ActivityCurrentNewsItemBinding
+    private lateinit var newsId: UUID
+    private lateinit var adapter: CommentsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val news = intent.getSerializableExtra(key) as News // ignore, requires Api level 33
-        val binding = ActivityCurrentNewsItemBinding.inflate(layoutInflater)
-        binding.newsTitle.text = news.title
-        authorImage?.also { binding.newsAuthorImage.setImageBitmap(it) }
-        val name = "${news.author.surname} ${news.author.firstName}"
-        binding.newsAuthorName.text = name
-        binding.newsDatetime.text = dateFormat.format(news.dateTime)
-        binding.newsImage.setImageDrawable(null)
-        image?.also { binding.newsImage.setImageBitmap(it) }
-        binding.newsText.text = news.text
+        @Suppress("DEPRECATION")
+        val news = intent.getSerializableExtra(key) as News
+        newsId = news.id
+        binding = ActivityCurrentNewsItemBinding.inflate(layoutInflater).apply {
+            newsTitle.text = news.title
+            authorImage?.also { newsAuthorImage.setImageBitmap(it) }
+            val name = "${news.author.surname} ${news.author.firstName}"
+            newsAuthorName.text = name
+            newsDatetime.text = dateFormat.format(news.dateTime)
+            newsImage.setImageDrawable(null)
+            image?.also { newsImage.setImageBitmap(it) }
+            newsText.text = news.text
+            if (CredentialsManager.isAuthenticated()) {
+                newsAuthor.setOnClickListener {
+                    onProfileClick(news.author.id)
+                }
+            }
+            postCommentButton.setOnClickListener { post() }
+        }
         if (CredentialsManager.isAuthenticated()) {
-            binding.newsAuthor.setOnClickListener {
-                onProfileClick(news.author.id)
+            adapter = CommentsAdapter(this, news.id)
+            binding.comments.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = this@CurrentNewsItemActivity.adapter
+            }
+        } else {
+            binding.apply {
+                commentsArea.visibility = View.GONE
+                comments.visibility = View.GONE
             }
         }
         setContentView(binding.root)
+    }
+
+    private fun post() {
+        val input = binding.input.text.toString()
+        if (input.isBlank()) {
+            return
+        }
+        adapter.post(CommentToSend(newsId, input))
+        binding.input.text = null
+        val service = this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        service.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
     }
 
     private fun onProfileClick(id: UUID) {

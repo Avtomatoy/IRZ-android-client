@@ -13,6 +13,7 @@ const val USER_POSITIONS = "/api/user_positions"
 const val MY_POSITIONS = "/api/user_positions/my"
 
 const val NEWS = "/api/news"
+const val NEWS_COMMENTS = "/api/news_comments"
 
 const val USERS = "/api/users"
 
