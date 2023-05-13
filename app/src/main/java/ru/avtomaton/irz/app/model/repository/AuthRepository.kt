@@ -6,15 +6,11 @@ import ru.avtomaton.irz.app.model.pojo.Email
 /**
  * @author Anton Akkuzin
  */
-object AuthRepository {
+object AuthRepository : Repository() {
 
     suspend fun resetPassword(email: Email): Boolean {
-        return try {
-            val response = IrzHttpClient.authApi.resetPassword(email)
-            response.isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
+        return tryForSuccess {
+            IrzHttpClient.authApi.resetPassword(email).isSuccessful
         }
     }
 }

@@ -5,7 +5,7 @@ import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.*
 import ru.avtomaton.irz.app.services.Base64Converter
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -39,34 +39,24 @@ object MessengerRepository : Repository() {
         searchString: String? = null
     ): OpResult<List<Message>> {
         return tryForResult {
-            val response =
-                IrzHttpClient.messengerApi.getMessages(chatId, pageIndex, pageSize, searchString)
-            if (!response.isSuccessful) {
-                return@tryForResult OpResult.Failure()
-            }
-            val list = response.body()!!.map { convert(it) }.toList()
-            OpResult.Success(list)
+            IrzHttpClient.messengerApi.getMessages(chatId, pageIndex, pageSize, searchString)
+                .letIfSuccess {
+                    this.body()!!.map { convert(it) }.toList()
+                }
         }
     }
 
     suspend fun getChats(pageIndex: Int, pageSize: Int): OpResult<List<Chat>> {
         return tryForResult {
-            val response = IrzHttpClient.messengerApi.getChats(pageIndex, pageSize)
-            if (!response.isSuccessful) {
-                return@tryForResult OpResult.Failure()
+            IrzHttpClient.messengerApi.getChats(pageIndex, pageSize).letIfSuccess {
+                this.body()!!.map { convert(it) }.toList()
             }
-            val list = response.body()!!.map { convert(it) }.toList()
-            OpResult.Success(list)
         }
     }
 
     suspend fun getChatFor(userId: UUID): OpResult<UUID> {
         return tryForResult {
-            val response = IrzHttpClient.messengerApi.getChatForUser(userId)
-            if (!response.isSuccessful) {
-                return@tryForResult OpResult.Failure()
-            }
-            OpResult.Success(response.body()!!)
+            IrzHttpClient.messengerApi.getChatForUser(userId).letIfSuccess { this.body()!! }
         }
     }
     private suspend fun convert(dto: ChatDto): Chat =
@@ -80,7 +70,7 @@ object MessengerRepository : Repository() {
     private suspend fun convert(dto: MessageDto): Message =
         Message(
             dto.id,
-            dto.text ?: "",
+            dto.text.orEmpty(),
             getImage(dto.imageId),
             dto.date,
             dto.senderId

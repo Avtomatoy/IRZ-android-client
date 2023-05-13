@@ -5,12 +5,12 @@ import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.Position
 import ru.avtomaton.irz.app.model.pojo.PositionDto
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
  */
-object UserPositionsRepository {
+object UserPositionsRepository : Repository() {
 
     suspend fun getMyPositions(): OpResult<List<Position>> {
         return getPositions { IrzHttpClient.userPositionsApi.myUserPositions() }
@@ -23,22 +23,13 @@ object UserPositionsRepository {
     private suspend fun getPositions(
         request: suspend () -> Response<List<PositionDto>>
     ): OpResult<List<Position>> {
-        return try {
-            val response = request.invoke()
-            if (response.isSuccessful)
-                convert(response.body()!!)
-            else
-                OpResult.Failure()
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            OpResult.Failure()
-        }
+        return tryForResult { request().letIfSuccess { convert(this.body()!!) } }
     }
 
-    private fun convert(positionDtoList: List<PositionDto>): OpResult<List<Position>> {
-        return OpResult.Success(positionDtoList
+    private fun convert(positionDtoList: List<PositionDto>): List<Position> {
+        return positionDtoList
             .sortedByDescending { it.start }
             .map { Position(it.start, it.end, it.positionInfo.name) }
-            .toList())
+            .toList()
     }
 }

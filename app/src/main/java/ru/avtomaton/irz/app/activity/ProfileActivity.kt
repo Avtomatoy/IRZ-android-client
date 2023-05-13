@@ -17,16 +17,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
 import ru.avtomaton.irz.app.activity.util.NewsSearchParams
-import ru.avtomaton.irz.app.model.OpResult
-import ru.avtomaton.irz.app.model.repository.UserRepository
-import ru.avtomaton.irz.app.model.pojo.User
 import ru.avtomaton.irz.app.databinding.ActivityProfileBinding
 import ru.avtomaton.irz.app.databinding.CareerPathElementBinding
 import ru.avtomaton.irz.app.databinding.ChangeUserInfoBinding
+import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.ImageDto
+import ru.avtomaton.irz.app.model.pojo.User
 import ru.avtomaton.irz.app.model.pojo.UserInfo
 import ru.avtomaton.irz.app.model.repository.MessengerRepository
 import ru.avtomaton.irz.app.model.repository.SubscriptionsRepository
+import ru.avtomaton.irz.app.model.repository.UserRepository
 import ru.avtomaton.irz.app.services.Base64Converter
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
@@ -61,7 +61,6 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
             newsButton.setOnClickListener { onNewsClick() }
             messengerButton.setOnClickListener { onMessengerClick() }
             searchButton.setOnClickListener { onSearchClick() }
-            eventsButton.setOnClickListener { onEventsClick() }
             profileButton.setOnClickListener { onProfileClick() }
             profileEditButton.setOnClickListener {
                 ChangeUserInfoBinding.inflate(layoutInflater).showDialog()
@@ -109,7 +108,7 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
 
     private suspend fun exit() {
         CredentialsManager.exit()
-        startActivity(NewsActivity.openNews(this@ProfileActivity))
+        startActivity(NewsActivity.openNews(this))
     }
 
     private suspend fun onSubscribe() {
@@ -203,7 +202,7 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         val aboutMyself = aboutMyselfText.text.toString()
         val myDoings = profileMyDoingsText.text.toString()
         val skills = profileSkillsText.text.toString()
-        if (aboutMyself.emptyBlank() || myDoings.emptyBlank() || skills.emptyBlank()) {
+        if (aboutMyself.isBlank() || myDoings.isBlank() || skills.isBlank()) {
             warn(emptyFields)
             return
         }

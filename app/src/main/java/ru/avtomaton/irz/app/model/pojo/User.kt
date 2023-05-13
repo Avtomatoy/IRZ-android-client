@@ -29,8 +29,4 @@ data class User(
     fun isSupport(): Boolean {
         return roles.contains("Support")
     }
-
-    fun isCabinetsManager(): Boolean {
-        return roles.contains("CabinetsManager")
-    }
 }

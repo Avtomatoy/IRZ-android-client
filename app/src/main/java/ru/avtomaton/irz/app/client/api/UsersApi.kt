@@ -1,17 +1,12 @@
 package ru.avtomaton.irz.app.client.api
 
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
-import retrofit2.http.Query
-import ru.avtomaton.irz.app.model.pojo.UserDto
+import retrofit2.http.*
 import ru.avtomaton.irz.app.constants.USERS
 import ru.avtomaton.irz.app.model.pojo.ImageDto
+import ru.avtomaton.irz.app.model.pojo.UserDto
 import ru.avtomaton.irz.app.model.pojo.UserInfo
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin

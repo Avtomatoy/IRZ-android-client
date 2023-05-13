@@ -2,19 +2,14 @@ package ru.avtomaton.irz.app.client.api
 
 import okhttp3.ResponseBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
-import ru.avtomaton.irz.app.model.pojo.NewsBody
-import ru.avtomaton.irz.app.model.pojo.NewsDto
+import retrofit2.http.*
 import ru.avtomaton.irz.app.constants.NEWS
 import ru.avtomaton.irz.app.constants.NEWS_COMMENTS
 import ru.avtomaton.irz.app.model.pojo.CommentDto
 import ru.avtomaton.irz.app.model.pojo.CommentToSend
-import java.util.UUID
+import ru.avtomaton.irz.app.model.pojo.NewsBody
+import ru.avtomaton.irz.app.model.pojo.NewsDto
+import java.util.*
 
 /**
  * @author Anton Akkuzin

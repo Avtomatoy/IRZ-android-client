@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/user_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -46,9 +47,9 @@
             android:id="@+id/position"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:spinnerMode="dropdown"
             android:layout_marginStart="5dp"
-            />
+            android:spinnerMode="dropdown"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <TextView
             android:layout_width="match_parent"
@@ -66,9 +67,9 @@
             android:id="@+id/role"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:spinnerMode="dropdown"
             android:layout_marginStart="5dp"
-            />
+            android:spinnerMode="dropdown"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </LinearLayout>
 

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.avtomaton.irz.app.activity.util.ChatAdapter
 import ru.avtomaton.irz.app.databinding.ActivityChatBinding
 import ru.avtomaton.irz.app.model.repository.UserRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin

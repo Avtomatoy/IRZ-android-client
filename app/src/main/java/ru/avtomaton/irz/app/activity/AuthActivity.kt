@@ -6,8 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.databinding.ActivityAuthBinding
 import ru.avtomaton.irz.app.databinding.ForgotPasswordDialogBinding
@@ -37,9 +35,10 @@ class AuthActivity : AppCompatActivityBase() {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(BackPressedCallback())
 
-        binding = ActivityAuthBinding.inflate(layoutInflater)
-        binding.authButton.setOnClickListener { this.lifecycleScope.launch { auth() } }
-        binding.forgotPasswordButton.setOnClickListener { showPasswordDialog() }
+        binding = ActivityAuthBinding.inflate(layoutInflater).apply {
+            authButton.setOnClickListener { async { auth() } }
+            forgotPasswordButton.setOnClickListener { showPasswordDialog() }
+        }
 
         awaitMessage = getString(R.string.auth_btn_await_message)
         buttonName = getString(R.string.auth_activity_sign_in_button_title)
@@ -76,12 +75,12 @@ class AuthActivity : AppCompatActivityBase() {
 
     private fun extractCredentials(): Credentials? {
         val email = binding.email.text.toString()
-        if (email.isEmpty() || email.isBlank()) {
+        if (email.isBlank()) {
             warn(missingEmail)
             return null
         }
         val password = binding.password.text.toString()
-        if (password.isEmpty() || password.isBlank()) {
+        if (password.isBlank()) {
             warn(missingPassword)
             return null
         }
@@ -89,25 +88,26 @@ class AuthActivity : AppCompatActivityBase() {
     }
 
     private fun showPasswordDialog() {
-        val alertDialog = AlertDialog.Builder(this).create()
-        val dialogBinding: ForgotPasswordDialogBinding = ForgotPasswordDialogBinding.inflate(layoutInflater)
-        alertDialog.setView(dialogBinding.root)
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ ->
-            val email = dialogBinding.email.text.toString()
-            if (email.isEmpty() || email.isBlank()) {
-                warn(dialogMissingEmail)
-                return@setButton
-            }
-            this.lifecycleScope.launch {
-                val success = AuthRepository.resetPassword(Email(email))
-                if (success) {
-                    warn(dialogSuccess)
-                } else {
-                    warn(dialogFail)
+        val dialog = AlertDialog.Builder(this).create()
+        ForgotPasswordDialogBinding.inflate(layoutInflater).apply {
+            dialog.setView(root)
+            dialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ ->
+                val email = email.text.toString()
+                if (email.isEmpty() || email.isBlank()) {
+                    warn(dialogMissingEmail)
+                    return@setButton
+                }
+                async {
+                    val success = AuthRepository.resetPassword(Email(email))
+                    if (success) {
+                        warn(dialogSuccess)
+                    } else {
+                        warn(dialogFail)
+                    }
                 }
             }
         }
-        alertDialog.show()
+        dialog.show()
     }
 
     inner class BackPressedCallback : OnBackPressedCallback(true) {

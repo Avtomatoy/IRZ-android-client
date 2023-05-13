@@ -5,14 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/activity_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Cool_Grey_1"
+        android:fontFamily="@font/montserrat_extrabold"
+        android:paddingStart="5sp"
+        android:paddingEnd="5sp"
+        android:text="@string/profile_activity_name"
+        android:textAlignment="textStart"
+        android:textColor="@color/Pantone_289_C"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:drawableEndCompat="@drawable/irz_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:clickable="true"/>
+
     <LinearLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/button_area"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/activity_name">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/header"
@@ -28,13 +48,14 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/section_main"
+                android:paddingBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/image"
-                    android:layout_width="125dp"
-                    android:layout_height="125dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:layout_margin="10dp"
                     android:src="@drawable/nevexal"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -182,7 +203,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:backgroundTint="@color/Pantone_289_C"
+                    android:textSize="13sp"
                     android:text="@string/profile_activity_about_myself_button"
+                    android:padding="5dp"
                     tools:ignore="ButtonStyle" />
 
                 <Button
@@ -192,6 +215,8 @@
                     android:layout_marginStart="5dp"
                     android:backgroundTint="@color/Cool_Grey_3"
                     android:text="@string/profile_activity_about_news_button"
+                    android:textSize="13sp"
+                    android:padding="5dp"
                     tools:ignore="ButtonStyle" />
 
                 <Button
@@ -199,8 +224,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
+                    android:padding="5dp"
                     android:backgroundTint="@color/Cool_Grey_3"
                     android:text="@string/profile_activity_about_career_path_button"
+                    android:textSize="13sp"
                     tools:ignore="ButtonStyle" />
             </LinearLayout>
         </LinearLayout>
@@ -377,17 +404,6 @@
             android:contentDescription="@string/search_button_description"
             android:scaleType="centerInside"
             android:src="@drawable/search_button" />
-
-        <ImageButton
-            android:id="@+id/events_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight=".20"
-            android:adjustViewBounds="true"
-            android:backgroundTint="@color/Pantone_289_C"
-            android:contentDescription="@string/calendar_button_description"
-            android:scaleType="centerInside"
-            android:src="@drawable/calendar_button" />
 
         <ImageButton
             android:id="@+id/profile_button"

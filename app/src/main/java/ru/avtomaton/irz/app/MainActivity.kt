@@ -2,8 +2,8 @@ package ru.avtomaton.irz.app
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -17,7 +17,7 @@ import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.client.IrzSignalRClientBuilder
 import ru.avtomaton.irz.app.databinding.ActivityMainBinding
 import ru.avtomaton.irz.app.services.CredentialsManager
-import java.util.Properties
+import java.util.*
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 

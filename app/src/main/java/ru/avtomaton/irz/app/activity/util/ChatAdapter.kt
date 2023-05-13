@@ -15,7 +15,7 @@ import ru.avtomaton.irz.app.model.pojo.Message
 import ru.avtomaton.irz.app.model.pojo.MessageDto
 import ru.avtomaton.irz.app.model.repository.ImageRepository
 import ru.avtomaton.irz.app.model.repository.MessengerRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -29,7 +29,7 @@ class ChatAdapter(
     private val searchString: String? = null
 ) : RecyclerView.Adapter<ChatAdapter.MessageViewHolder>() {
 
-    private var connection: HubConnection? = null // IrzSignalRClientBuilder.build()
+    private var connection: HubConnection? = null
     private val messagesList: MutableList<Message> = mutableListOf()
     private val pageSize = 20
 
@@ -48,7 +48,8 @@ class ChatAdapter(
         if (connection == null) {
             connection = IrzSignalRClientBuilder.build()
             context.async {
-                updateChats(0)
+                updateMessages(0)
+                recycler.scrollToPosition(0)
                 connection!!.start().blockingAwait()
                 connection!!.on(
                     "messageReceived",
@@ -103,17 +104,20 @@ class ChatAdapter(
             return
         }
         messagesList.removeAt(index)
-        context.runOnUiThread { notifyItemRemoved(index) }
+        context.runOnUiThread {
+            notifyItemRemoved(index)
+            recycler.scrollToPosition(0)
+        }
     }
 
     private fun onMessagesUpdate(position: Int) {
         if (itemCount % pageSize != 0 || itemCount - position != 5) {
             return
         }
-        context.async { updateChats(itemCount / pageSize) }
+        context.async { updateMessages(itemCount / pageSize) }
     }
 
-    private suspend fun updateChats(pageIndex: Int) {
+    private suspend fun updateMessages(pageIndex: Int) {
         val result = MessengerRepository.getMessages(chatId, pageIndex, pageSize, searchString)
         if (result.isFailure) {
             context.error()
@@ -155,6 +159,7 @@ class ChatAdapter(
         fun bind(message: Message) {
             messageItem.apply {
                 image.setImageBitmap(message.image)
+                image.visibility = View.VISIBLE
                 if (message.image == null)
                     image.visibility = View.GONE
                 text.text = message.text

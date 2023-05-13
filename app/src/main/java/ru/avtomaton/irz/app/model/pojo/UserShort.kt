@@ -1,8 +1,8 @@
 package ru.avtomaton.irz.app.model.pojo
 
 import android.graphics.Bitmap
-import java.util.UUID
 import java.io.Serializable
+import java.util.*
 
 /**
  * @author Anton Akkuzin

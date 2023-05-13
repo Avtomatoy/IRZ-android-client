@@ -5,7 +5,7 @@ import ru.avtomaton.irz.app.activity.util.NewsSearchParams
 import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.*
-import java.util.UUID
+import java.util.*
 import java.util.function.Predicate
 
 /**
@@ -15,26 +15,21 @@ object NewsRepository : Repository() {
 
     suspend fun getComments(id: UUID, pageIndex: Int, pageSize: Int): OpResult<List<Comment>> {
         return tryForResult {
-            val response = IrzHttpClient.newsApi.getComments(id, pageIndex, pageSize)
-            if (!response.isSuccessful) {
-                return@tryForResult OpResult.Failure()
-            }
             val me = UserRepository.getMe()
             if (me.isFailure) {
                 return@tryForResult OpResult.Failure()
             }
-            val list = response.body()!!.map { convert(it) { id -> me.value().id == id } }.toList()
-            OpResult.Success(list)
+            IrzHttpClient.newsApi.getComments(id, pageIndex, pageSize).letIfSuccess {
+                this.body()!!.map { convert(it) { id -> me.value().id == id } }.toList()
+            }
         }
     }
 
     suspend fun postComment(comment: CommentToSend): OpResult<Comment> {
         return tryForResult {
-            val response = IrzHttpClient.newsApi.postComment(comment)
-            if (!response.isSuccessful) {
-                return@tryForResult OpResult.Failure()
+            IrzHttpClient.newsApi.postComment(comment).letIfSuccess {
+                convert(this.body()!!) { true }
             }
-            OpResult.Success(convert(response.body()!!) { true })
         }
     }
 
@@ -45,11 +40,8 @@ object NewsRepository : Repository() {
     }
 
     suspend fun tryLikeNews(newsId: UUID): Boolean {
-        return try {
+        return tryForSuccess {
             IrzHttpClient.likesApi.like(newsId).isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
         }
     }
 
@@ -62,6 +54,12 @@ object NewsRepository : Repository() {
     suspend fun tryDeleteNews(newsId: UUID): Boolean {
         return tryForSuccess {
             IrzHttpClient.newsApi.deleteNews(newsId).isSuccessful
+        }
+    }
+
+    suspend fun postNews(newsBody: NewsBody): Boolean {
+        return tryForSuccess {
+            IrzHttpClient.newsApi.postNews(newsBody).isSuccessful
         }
     }
 
@@ -97,21 +95,18 @@ object NewsRepository : Repository() {
 
     suspend fun getNews(params: NewsSearchParams): OpResult<List<News>> {
         return tryForResult {
-            val newsResponse = IrzHttpClient.newsApi.getNews(
+            IrzHttpClient.newsApi.getNews(
                 params.authorId,
                 params.publicOnly,
                 params.likedOnly,
                 params.pageIndex,
                 params.pageSize
-            )
-            val newsObserver = UserRepository.getMe()
-            if (!newsResponse.isSuccessful) {
-                return@tryForResult OpResult.Failure()
+            ).letIfSuccess {
+                val newsObserver = UserRepository.getMe()
+                this.body()!!
+                    .map { it -> mapNewsDto(it) { canDelete(it, newsObserver) } }
+                    .toList()
             }
-            val newsList = newsResponse.body()!!
-                .map { it -> mapNewsDto(it) { canDelete(it, newsObserver) } }
-                .toList()
-            OpResult.Success(newsList)
         }
     }
 

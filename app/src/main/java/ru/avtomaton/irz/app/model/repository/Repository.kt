@@ -1,5 +1,6 @@
 package ru.avtomaton.irz.app.model.repository
 
+import retrofit2.Response
 import ru.avtomaton.irz.app.model.OpResult
 
 /**
@@ -23,5 +24,11 @@ open class Repository {
             ex.printStackTrace()
             false
         }
+    }
+
+    protected suspend fun <T, R> Response<T>.letIfSuccess(block: suspend Response<T>.() -> R): OpResult<R> {
+        if (!this.isSuccessful)
+            return OpResult.Failure()
+        return OpResult.Success(block())
     }
 }

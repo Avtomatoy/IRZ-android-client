@@ -5,7 +5,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 import ru.avtomaton.irz.app.constants.LIKES_LIKE
 import ru.avtomaton.irz.app.constants.LIKES_UNLIKE
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin

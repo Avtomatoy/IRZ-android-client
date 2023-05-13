@@ -47,9 +47,8 @@ class SearchUsersAdapter(private val listener: Listener) :
 
         fun bindUser(user: UserShort) {
             this.user = user
-
             @SuppressLint("SetTextI18n")
-            searchUserBinding.userName.text = "${user.surname} ${user.firstName} ${user.patronymic}"
+            searchUserBinding.userName.text = user.fullName
             user.image?.also { searchUserBinding.userImage.setImageBitmap(it) }
         }
     }

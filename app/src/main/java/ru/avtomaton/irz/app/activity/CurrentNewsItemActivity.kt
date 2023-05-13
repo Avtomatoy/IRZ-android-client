@@ -1,5 +1,6 @@
 package ru.avtomaton.irz.app.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -9,9 +10,9 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.avtomaton.irz.app.activity.util.CommentsAdapter
-import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.databinding.ActivityCurrentNewsItemBinding
 import ru.avtomaton.irz.app.model.pojo.CommentToSend
+import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
@@ -49,18 +50,16 @@ class CurrentNewsItemActivity : AppCompatActivityBase() {
         binding = ActivityCurrentNewsItemBinding.inflate(layoutInflater).apply {
             newsTitle.text = news.title
             authorImage?.also { newsAuthorImage.setImageBitmap(it) }
-            val name = "${news.author.surname} ${news.author.firstName}"
-            newsAuthorName.text = name
+            @SuppressLint("SetTextI18n")
+            newsAuthorName.text = "${news.author.surname} ${news.author.firstName}"
             newsDatetime.text = dateFormat.format(news.dateTime)
             newsImage.setImageDrawable(null)
             image?.also { newsImage.setImageBitmap(it) }
             newsText.text = news.text
-            if (CredentialsManager.isAuthenticated()) {
-                newsAuthor.setOnClickListener {
-                    onProfileClick(news.author.id)
-                }
-            }
             postCommentButton.setOnClickListener { post() }
+            if (CredentialsManager.isAuthenticated()) {
+                newsAuthor.setOnClickListener { onProfileClick(news.author.id) }
+            }
         }
         if (CredentialsManager.isAuthenticated()) {
             adapter = CommentsAdapter(this, news.id)

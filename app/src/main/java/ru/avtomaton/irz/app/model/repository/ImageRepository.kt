@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * @author Anton Akkuzin
  */
-object ImageRepository {
+object ImageRepository : Repository() {
 
     private val cache: MutableMap<UUID, Bitmap> = ConcurrentHashMap()
 
@@ -32,6 +32,7 @@ object ImageRepository {
             cache[imageId] = bitmapResult.value()
             bitmapResult
         } catch (ex: Throwable) {
+            ex.printStackTrace()
             OpResult.Failure()
         }
     }

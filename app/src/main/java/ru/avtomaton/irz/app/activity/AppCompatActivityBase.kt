@@ -19,7 +19,7 @@ open class AppCompatActivityBase : AppCompatActivity() {
 
     protected val threeDots: String = "…"
     protected val tag: String = this.javaClass.simpleName
-    private val code: Int = 1488
+    private val code: Int = 1337
     protected lateinit var onImageUploaded: (Uri) -> Unit
 
     companion object {
@@ -67,9 +67,4 @@ open class AppCompatActivityBase : AppCompatActivity() {
         }
         block(this.value())
     }
-
-    protected fun String.orEmpty(): String =
-        if (this.isEmpty() || this.isBlank()) threeDots else this
-
-    protected fun String.emptyBlank(): Boolean = this.isEmpty() || this.isBlank()
 }

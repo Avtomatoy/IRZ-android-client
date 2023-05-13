@@ -8,7 +8,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.avtomaton.irz.app.activity.util.MessengerAdapter
 import ru.avtomaton.irz.app.databinding.ActivityMessengerBinding
 import ru.avtomaton.irz.app.model.repository.UserRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -26,7 +26,6 @@ class MessengerActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRe
             newsButton.setOnClickListener { onNewsClick() }
             messengerButton.setOnClickListener { chatsFeed.scrollToPosition(0) }
             searchButton.setOnClickListener { onSearchClick() }
-            eventsButton.setOnClickListener { onEventsClick() }
             profileButton.setOnClickListener { onProfileClick() }
         }
         setContentView(binding.root)

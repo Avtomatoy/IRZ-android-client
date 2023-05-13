@@ -1,7 +1,6 @@
 package ru.avtomaton.irz.app.model.pojo
 
 import com.google.gson.annotations.SerializedName
-import ru.avtomaton.irz.app.model.pojo.ImageDto
 
 /**
  * @author Anton Akkuzin

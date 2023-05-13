@@ -10,7 +10,7 @@ import ru.avtomaton.irz.app.databinding.CommentItemBinding
 import ru.avtomaton.irz.app.model.pojo.Comment
 import ru.avtomaton.irz.app.model.pojo.CommentToSend
 import ru.avtomaton.irz.app.model.repository.NewsRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -37,7 +37,6 @@ class CommentsAdapter(
 
     override fun onBindViewHolder(holder: CommentHolder, position: Int) {
         holder.bind(commentsList[position])
-        // holder. // ?
         context.async { onCommentsUpdate(position) }
     }
 

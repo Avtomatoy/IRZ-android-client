@@ -9,7 +9,7 @@ import ru.avtomaton.irz.app.activity.ChatActivity
 import ru.avtomaton.irz.app.databinding.MessengerItemBinding
 import ru.avtomaton.irz.app.model.pojo.Chat
 import ru.avtomaton.irz.app.model.repository.MessengerRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin

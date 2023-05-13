@@ -2,8 +2,7 @@ package ru.avtomaton.irz.app.model.pojo
 
 import android.graphics.Bitmap
 import java.io.Serializable
-import java.util.UUID
-import java.util.Date
+import java.util.*
 
 /**
  * @author Anton Akkuzin

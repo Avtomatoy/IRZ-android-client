@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <LinearLayout
         android:id="@+id/user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/Cool_Grey_3"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="5dp"
-        android:background="@color/Cool_Grey_3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -41,19 +42,19 @@
         android:id="@+id/search_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/user"
-        app:layout_constraintBottom_toTopOf="@id/chat_feed"
         android:orientation="horizontal"
-        >
+        app:layout_constraintBottom_toTopOf="@id/chat_feed"
+        app:layout_constraintTop_toBottomOf="@id/user">
 
         <EditText
             android:id="@+id/search_input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_weight=".80"
+            android:autofillHints=""
             android:hint="@string/chat_activity_seach_message_hint"
-            android:autofillHints="" />
+            android:inputType="text"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <ImageView
             android:id="@+id/search_button"
@@ -61,10 +62,10 @@
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:background="@color/Pantone_289_C"
+            android:contentDescription="TODO"
             android:padding="5dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/search_button"
-            android:contentDescription="TODO" />
+            app:srcCompat="@drawable/search_button" />
 
     </LinearLayout>
 
@@ -73,8 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/input_area"
-        app:layout_constraintTop_toBottomOf="@id/search_area"
-        />
+        app:layout_constraintTop_toBottomOf="@id/search_area" />
 
     <LinearLayout
         android:id="@+id/input_area"
@@ -87,9 +87,10 @@
             android:id="@+id/input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_weight=".80"
-            android:hint="@string/chat_activity_message_hint"/>
+            android:hint="@string/chat_activity_message_hint"
+            android:inputType="textCapSentences"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <ImageView
             android:id="@+id/upload_image_button"
@@ -97,22 +98,22 @@
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:background="@color/Pantone_289_C"
+            android:contentDescription="TODO"
             android:padding="5dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/pin"
-            android:contentDescription="TODO" />
+            app:srcCompat="@drawable/pin" />
 
         <ImageView
             android:id="@+id/remove_image_button"
-            android:visibility="gone"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:background="@color/Pantone_187_C"
+            android:contentDescription="TODO"
             android:padding="5dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/remove"
-            android:contentDescription="TODO" />
+            android:visibility="gone"
+            app:srcCompat="@drawable/remove" />
 
         <ImageView
             android:id="@+id/send_button"
@@ -121,11 +122,11 @@
             android:layout_marginStart="10dp"
             android:adjustViewBounds="true"
             android:background="@color/Pantone_289_C"
+            android:contentDescription="TODO"
             android:padding="5dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/message_button"
-            android:contentDescription="TODO" />
-        
+            app:srcCompat="@drawable/message_button" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,8 +8,8 @@ import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.AppCompatActivityBase
 import ru.avtomaton.irz.app.activity.CurrentNewsItemActivity
 import ru.avtomaton.irz.app.activity.ProfileActivity
-import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.databinding.NewsItemBinding
+import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.model.repository.NewsRepository
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
@@ -115,10 +115,7 @@ class NewsFeedAdapter(
         }
 
         private fun setLikeLogo() {
-            val id = if (liked)
-                R.drawable.heartred
-            else
-                R.drawable.heart
+            val id = if (liked) R.drawable.heartred else R.drawable.heart
             newsItem.likeLogo.setImageResource(id)
         }
 
@@ -138,10 +135,9 @@ class NewsFeedAdapter(
         }
 
         private fun onProfileClick(id: UUID) {
-            if (!CredentialsManager.isAuthenticated()) {
-                return
+            if (CredentialsManager.isAuthenticated()) {
+                context.startActivity(ProfileActivity.openProfile(context, id))
             }
-            context.startActivity(ProfileActivity.openProfile(context, id))
         }
 
         private suspend fun onNewsDelete(currentNews: News) {

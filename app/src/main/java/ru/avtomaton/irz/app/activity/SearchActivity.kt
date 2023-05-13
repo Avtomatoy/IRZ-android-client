@@ -7,16 +7,16 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import ru.avtomaton.irz.app.activity.util.UserSearchParams
 import ru.avtomaton.irz.app.activity.util.SearchParamsSpinner.positionSpinner
 import ru.avtomaton.irz.app.activity.util.SearchParamsSpinner.rolesSpinner
 import ru.avtomaton.irz.app.activity.util.SearchUsersAdapter
+import ru.avtomaton.irz.app.activity.util.UserSearchParams
 import ru.avtomaton.irz.app.databinding.ActivitySearchBinding
 import ru.avtomaton.irz.app.databinding.SearchParamsBinding
 import ru.avtomaton.irz.app.model.pojo.UserShort
 import ru.avtomaton.irz.app.model.repository.PositionRepository
 import ru.avtomaton.irz.app.model.repository.UserRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -43,7 +43,6 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
         binding.newsButton.setOnClickListener { onNewsClick() }
         binding.messengerButton.setOnClickListener { onMessengerClick() }
         binding.zearchButton.setOnClickListener { onSearchClick() }
-        binding.eventsButton.setOnClickListener { onEventsClick() }
         binding.profileButton.setOnClickListener { onProfileClick() }
 
         async {
@@ -81,14 +80,8 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
     }
 
     private suspend fun updateUsers(pageIndex: Int, pageSize: Int) {
-        binding.userInput.query.toString().apply {
-            if (this.isNotEmpty() && this.isNotBlank()) {
-                paramsBuilder.searchString = this
-            } else {
-                paramsBuilder.searchString = null
-            }
-        }
         val params = paramsBuilder.let {
+            it.searchString = binding.userInput.query.toString().ifBlank { null }
             it.pageIndex = pageIndex
             it.pageSize = pageSize
             it.build()

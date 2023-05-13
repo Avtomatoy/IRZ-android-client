@@ -17,10 +17,6 @@ open class NavbarAppCompatActivityBase: AppCompatActivityBase(), NavbarListener 
         startActivity(SearchActivity.open(this))
     }
 
-    override fun onEventsClick() {
-        TODO("Not yet implemented")
-    }
-
     override fun onProfileClick() {
         startActivity(ProfileActivity.openMyProfile(this))
     }
