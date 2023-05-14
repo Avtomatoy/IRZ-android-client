@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.View
@@ -14,20 +13,20 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.util.NewsFeedAdapter
 import ru.avtomaton.irz.app.activity.util.NewsSearchParams
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.ActivityProfileBinding
 import ru.avtomaton.irz.app.databinding.CareerPathElementBinding
 import ru.avtomaton.irz.app.databinding.ChangeUserInfoBinding
 import ru.avtomaton.irz.app.model.OpResult
-import ru.avtomaton.irz.app.model.pojo.ImageDto
 import ru.avtomaton.irz.app.model.pojo.User
 import ru.avtomaton.irz.app.model.pojo.UserInfo
 import ru.avtomaton.irz.app.model.repository.MessengerRepository
 import ru.avtomaton.irz.app.model.repository.SubscriptionsRepository
 import ru.avtomaton.irz.app.model.repository.UserRepository
-import ru.avtomaton.irz.app.services.Base64Converter
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
@@ -138,7 +137,10 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         aboutMyselfText.text = currentUser.aboutMyself
         profileSkillsText.text = currentUser.skills
         profileMyDoingsText.text = currentUser.myDoings
-        image.setImageBitmap(currentUser.image ?: defaultImage)
+        image.setImageBitmap(defaultImage)
+        currentUser.imageId?.also {
+            Glide.with(this@ProfileActivity).loadImageBy(it).error(defaultImage).into(image)
+        }
         name.text = currentUser.firstName
         surname.text = currentUser.surname
         patronymic.text = currentUser.patronymic
@@ -171,34 +173,27 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
     }
 
     private fun ChangeUserInfoBinding.showDialog() {
-        var imageModified = false
         aboutMyselfText.text = SpannableStringBuilder(user.aboutMyself)
         profileMyDoingsText.text = SpannableStringBuilder(user.myDoings)
         profileSkillsText.text = SpannableStringBuilder(user.skills)
-        if (user.image != null) {
-            image.setImageBitmap(user.image)
+        user.imageId?.also { Glide.with(this@ProfileActivity).loadImageBy(it).into(image) }
+        newPhotoButton.setOnClickListener { contract.launch("image/*") }
+        onImageUploaded = { Glide.with(this@ProfileActivity).load(it).into(image) }
+        deletePhotoButton.setOnClickListener {
+            imageUri = null
+            Glide.with(this@ProfileActivity).load(defaultImage).into(image)
         }
-        onImageUploaded = { uri ->
-            run {
-                this.image.setImageURI(uri)
-                imageModified = true
-            }
-        }
-        newPhotoButton.setOnClickListener { uploadImage() }
-        deletePhotoButton.setOnClickListener { image.setImageDrawable(null) }
         AlertDialog.Builder(this@ProfileActivity).create().apply {
             setView(this@showDialog.root)
             setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ ->
                 kotlin.run {
-                    async { this@showDialog.updateInfo(imageModified) }
+                    async { this@showDialog.updateInfo() }
                 }
             }
         }.show()
     }
 
-    private suspend fun ChangeUserInfoBinding.updateInfo(
-        imageModified: Boolean
-    ) {
+    private suspend fun ChangeUserInfoBinding.updateInfo() {
         val aboutMyself = aboutMyselfText.text.toString()
         val myDoings = profileMyDoingsText.text.toString()
         val skills = profileSkillsText.text.toString()
@@ -210,26 +205,20 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
             error()
             return
         }
-        if (!processPhoto(image.drawable, imageModified)) {
+        if (!processPhoto()) {
             error()
             return
         }
         this@ProfileActivity.binding.setUserInfo(user.id)
     }
 
-    private suspend fun processPhoto(drawable: Drawable?, imageModified: Boolean): Boolean {
-        if (drawable == null) {
+    private suspend fun processPhoto(): Boolean {
+        if (imageUri == null) {
             return UserRepository.deletePhoto()
         }
-        if (!imageModified) {
-            return true
-        }
-        val result = Base64Converter.convert(drawable.toBitmap())
-        if (result.isFailure) {
-            warn(imageLoadError)
-            return false
-        }
-        return UserRepository.updatePhoto(ImageDto("final", "png", result.value()))
+        val image = imageUri?.toImageBytes() ?: return false
+
+        return UserRepository.updatePhoto(image)
     }
 
     private fun ActivityProfileBinding.sectionClick(section: Section) {

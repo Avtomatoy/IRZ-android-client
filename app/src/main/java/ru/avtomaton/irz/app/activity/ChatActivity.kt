@@ -1,17 +1,15 @@
 package ru.avtomaton.irz.app.activity
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.activity.util.ChatAdapter
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.ActivityChatBinding
 import ru.avtomaton.irz.app.model.repository.UserRepository
 import java.util.*
@@ -23,8 +21,6 @@ class ChatActivity : AppCompatActivityBase() {
 
     private lateinit var binding: ActivityChatBinding
     private lateinit var adapter: ChatAdapter
-
-    private var image: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,12 +35,17 @@ class ChatActivity : AppCompatActivityBase() {
                 ChatAdapter(this@ChatActivity, chatFeed, chatId, recipientId, ownerId)
             sendButton.setOnClickListener { send() }
             searchButton.setOnClickListener { search() }
-            uploadImageButton.setOnClickListener { uploadImage() }
-            onImageUploaded = { uri -> uploadCallback(uri) }
+            uploadImageButton.setOnClickListener { contract.launch("image/*") }
+            onImageUploaded = {
+                apply {
+                    removeImageButton.visibility = View.VISIBLE
+                    uploadImageButton.visibility = View.GONE
+                }
+            }
             removeImageButton.setOnClickListener { removeImage() }
             chatFeed.setUp()
+            setContentView(root)
         }
-        setContentView(binding.root)
     }
 
     private fun recreateAdapter(searchString: String?) {
@@ -53,8 +54,11 @@ class ChatActivity : AppCompatActivityBase() {
     }
 
     private fun RecyclerView.setUp() {
-        layoutManager =
-            LinearLayoutManager(this@ChatActivity, RecyclerView.VERTICAL, true)
+        layoutManager = LinearLayoutManager(
+            this@ChatActivity,
+            RecyclerView.VERTICAL,
+            true
+        )
         adapter = this@ChatActivity.adapter
     }
 
@@ -65,13 +69,11 @@ class ChatActivity : AppCompatActivityBase() {
 
     private fun send() {
         binding.input.text.toString().apply {
-            if (isBlank() && image == null) {
-                return@apply
-            }
-            adapter.send(this, image)
+            if (isBlank() && imageUri == null) return@apply
+            adapter.send(this, imageUri?.toImageBytes())
             removeImage()
             binding.input.text = SpannableStringBuilder("")
-            image = null
+            imageUri = null
         }
     }
 
@@ -82,25 +84,18 @@ class ChatActivity : AppCompatActivityBase() {
         binding.searchInput.text = null
     }
 
-    private fun uploadCallback(uri: Uri) {
-        @Suppress("DEPRECATION")
-        image = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
-        binding.removeImageButton.visibility = View.VISIBLE
-        binding.uploadImageButton.visibility = View.GONE
-    }
-
     private fun removeImage() {
         binding.removeImageButton.visibility = View.GONE
         binding.uploadImageButton.visibility = View.VISIBLE
-        image = null
+        imageUri = null
     }
 
     private suspend fun ActivityChatBinding.bindRecipient(recipientId: UUID) =
         UserRepository.getUser(recipientId).letIfSuccess {
-            image?.let { this@bindRecipient.userImage.setImageBitmap(it) }
-            @SuppressLint("SetTextI18n")
-            this@bindRecipient.userName.text =
-                "${this.surname} ${this.firstName} ${this.patronymic}"
+            imageId?.also {
+                Glide.with(this@ChatActivity).loadImageBy(it).into(userImage)
+            }
+            this@bindRecipient.userName.text = this.fullName
         }
 
     companion object {

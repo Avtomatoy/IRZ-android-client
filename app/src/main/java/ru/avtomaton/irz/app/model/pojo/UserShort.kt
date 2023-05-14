@@ -13,5 +13,6 @@ data class UserShort(
     val surname: String,
     val patronymic: String?,
     val fullName: String,
-    @Transient val image: Bitmap?
+    val imageId: UUID?
+//    @Transient val image: Bitmap?
 ): Serializable

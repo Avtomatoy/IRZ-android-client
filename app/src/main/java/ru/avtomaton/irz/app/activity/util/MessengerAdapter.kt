@@ -1,11 +1,12 @@
 package ru.avtomaton.irz.app.activity.util
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.activity.AppCompatActivityBase
 import ru.avtomaton.irz.app.activity.ChatActivity
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.MessengerItemBinding
 import ru.avtomaton.irz.app.model.pojo.Chat
 import ru.avtomaton.irz.app.model.repository.MessengerRepository
@@ -79,14 +80,11 @@ class MessengerAdapter(
         fun bind(chat: Chat) {
             chatItem.apply {
                 val user = chat.recipient
-                user.image?.let { userImage.setImageBitmap(it) }
-                @SuppressLint("SetTextI18n")
-                userName.text = "${user.surname} ${user.firstName} ${user.patronymic ?: ""}"
+                user.imageId?.also { Glide.with(context).loadImageBy(it).into(userImage) }
+                userName.text = user.fullName
                 chat.lastMessage?.let {
-                    val prefix = if (it.senderId == userId) "Вы: " else ""
-                    @SuppressLint("SetTextI18n")
-                    lastMessage.text = "${prefix}${it.text}"
-
+                    val text = "${if (it.senderId == userId) "Вы: " else ""}${it.text}"
+                    lastMessage.text = text
                     date.text = AppCompatActivityBase.dateFormat.format(it.date)
                 }
             }

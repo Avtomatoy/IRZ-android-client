@@ -16,8 +16,9 @@
         android:text="@string/profile_activity_name"
         android:textAlignment="textStart"
         android:textColor="@color/Pantone_289_C"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:textStyle="bold"
+        android:gravity="center|start"
         app:drawableEndCompat="@drawable/irz_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +68,7 @@
                     android:id="@+id/surname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/montserrat_extrabold"
                     android:text="@string/profile_surname_placeholder"
@@ -80,7 +81,7 @@
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:fontFamily="@font/montserrat_extrabold"
                     android:text="@string/profile_name_placeholder"
                     android:textColor="@color/Pantone_295_C"
@@ -92,7 +93,7 @@
                     android:id="@+id/patronymic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:fontFamily="@font/montserrat_extrabold"
                     android:text="@string/profile_patronymic_placeholder"
                     android:textColor="@color/Pantone_295_C"
@@ -102,10 +103,11 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/profile_action_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"
                     android:clickable="true"
                     app:cardCornerRadius="15dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -113,8 +115,8 @@
 
                     <ImageView
                         android:id="@+id/profile_action_logo"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:background="@color/Pantone_289_C"
                         android:contentDescription="@string/profile_action_logo_description"
@@ -126,8 +128,8 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/profile_edit_button"
                     android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginEnd="5dp"
                     android:clickable="true"
@@ -137,8 +139,8 @@
 
                     <ImageView
                         android:id="@+id/profile_edit_logo"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:background="@color/Pantone_289_C"
                         android:contentDescription="@string/profile_action_logo_description"
@@ -149,9 +151,9 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/profile_message_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="5dp"
                     android:clickable="true"
                     app:cardCornerRadius="15dp"
@@ -160,8 +162,8 @@
 
                     <ImageView
                         android:id="@+id/profile_message_logo"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:adjustViewBounds="true"
                         android:background="@color/Pantone_289_C"
                         android:contentDescription="@string/profile_action_logo_description"
@@ -172,9 +174,9 @@
 
                 <TextView
                     android:id="@+id/main_position"
-                    android:layout_width="wrap_content"
+                    android:layout_width="220dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="12dp"
                     android:fontFamily="@font/montserrat"
                     android:text="@string/profile_position_placeholder"

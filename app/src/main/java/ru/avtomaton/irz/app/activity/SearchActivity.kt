@@ -71,7 +71,7 @@ class SearchActivity : NavbarAppCompatActivityBase(), SearchUsersAdapter.Listene
     }
 
     private fun recreateAdapter() {
-        adapter = SearchUsersAdapter(this)
+        adapter = SearchUsersAdapter(this, this)
         this.lifecycleScope.launch { updateUsers(0, pageSize) }
         binding.usersArea.apply {
             layoutManager = LinearLayoutManager(this@SearchActivity)

@@ -1,6 +1,5 @@
 package ru.avtomaton.irz.app.model.repository
 
-import android.graphics.Bitmap
 import retrofit2.Response
 import ru.avtomaton.irz.app.activity.util.UserSearchParams
 import ru.avtomaton.irz.app.client.IrzHttpClient
@@ -13,9 +12,9 @@ import java.util.*
  */
 object UserRepository : Repository() {
 
-    suspend fun updatePhoto(imageDto: ImageDto): Boolean {
+    suspend fun updatePhoto(image: ByteArray): Boolean {
         return tryForSuccess {
-            IrzHttpClient.usersApi.updatePhoto(imageDto).isSuccessful
+            IrzHttpClient.usersApi.updatePhoto(image.asMultipartBody("file")).isSuccessful
         }
     }
 
@@ -81,7 +80,7 @@ object UserRepository : Repository() {
             dto.patronymic.orEmpty(),
             getFullName(dto),
             dto.birthday,
-            getImage(dto.imageId),
+            dto.imageId,
             dto.aboutMyself.orDots(),
             dto.myDoings.orDots(),
             dto.skills.orDots(),
@@ -96,14 +95,14 @@ object UserRepository : Repository() {
         )
     }
 
-    private suspend fun convert(dto: UserDto): UserShort {
+    private fun convert(dto: UserDto): UserShort {
         return UserShort(
             dto.id,
             dto.firstName,
             dto.surname,
             dto.patronymic.orEmpty(),
             getFullName(dto),
-            getImage(dto.imageId)
+            dto.imageId
         )
     }
 
@@ -121,15 +120,6 @@ object UserRepository : Repository() {
         } catch (ex: Throwable) {
             ex.printStackTrace()
             null
-        }
-    }
-
-    private suspend fun getImage(imageId: UUID?): Bitmap? {
-        if (imageId == null) {
-            return null
-        }
-        return ImageRepository.getImage(imageId).let {
-            if (it.isOk) return it.value() else null
         }
     }
 }

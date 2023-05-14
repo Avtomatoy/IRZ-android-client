@@ -1,19 +1,18 @@
 package ru.avtomaton.irz.app.activity.util
 
 import android.app.AlertDialog
-import android.graphics.Bitmap
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.microsoft.signalr.HubConnection
 import ru.avtomaton.irz.app.activity.AppCompatActivityBase
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.client.IrzSignalRClientBuilder
 import ru.avtomaton.irz.app.databinding.MessageItemBinding
 import ru.avtomaton.irz.app.model.pojo.Message
 import ru.avtomaton.irz.app.model.pojo.MessageDto
-import ru.avtomaton.irz.app.model.repository.ImageRepository
 import ru.avtomaton.irz.app.model.repository.MessengerRepository
 import java.util.*
 
@@ -53,7 +52,7 @@ class ChatAdapter(
                 connection!!.start().blockingAwait()
                 connection!!.on(
                     "messageReceived",
-                    { dto -> context.async { onMessageReceived(dto) } },
+                    { dto -> onMessageReceived(dto) },
                     MessageDto::class.java
                 )
                 connection!!.on(
@@ -78,7 +77,7 @@ class ChatAdapter(
         onMessagesUpdate(position)
     }
 
-    fun send(text: String?, image: Bitmap?) {
+    fun send(text: String?, image: ByteArray?) {
         context.async {
             if (!MessengerRepository.postMessage(recipientId, text, image)) {
                 context.error()
@@ -86,16 +85,15 @@ class ChatAdapter(
         }
     }
 
-    private suspend fun onMessageReceived(dto: MessageDto) {
-        val image = dto.imageId?.let {
-            val result = ImageRepository.getImage(it)
-            if (result.isFailure)
-                return
-            result.value()
+    private fun onMessageReceived(dto: MessageDto) {
+        messagesList.add(
+            0,
+            Message(dto.id, dto.text ?: "", dto.imageId, dto.date, dto.senderId)
+        )
+        context.runOnUiThread {
+            notifyItemInserted(0)
+            recycler.scrollToPosition(0)
         }
-        messagesList.add(0, Message(dto.id, dto.text ?: "", image, dto.date, dto.senderId))
-        notifyItemInserted(0)
-        recycler.scrollToPosition(0)
     }
 
     private fun onMessageDeleted(id: UUID) {
@@ -158,10 +156,7 @@ class ChatAdapter(
 
         fun bind(message: Message) {
             messageItem.apply {
-                image.setImageBitmap(message.image)
-                image.visibility = View.VISIBLE
-                if (message.image == null)
-                    image.visibility = View.GONE
+                message.imageId?.also { Glide.with(context).loadImageBy(it).into(image) }
                 text.text = message.text
                 date.text = AppCompatActivityBase.dateFormat.format(message.date)
 

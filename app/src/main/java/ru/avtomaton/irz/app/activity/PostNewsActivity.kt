@@ -4,14 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.core.graphics.drawable.toBitmap
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.databinding.ActivityPostNewsBinding
-import ru.avtomaton.irz.app.model.pojo.ImageDto
-import ru.avtomaton.irz.app.model.pojo.NewsBody
 import ru.avtomaton.irz.app.model.repository.NewsRepository
 import ru.avtomaton.irz.app.model.repository.UserRepository
-import ru.avtomaton.irz.app.services.Base64Converter
 
 /**
  * @author Anton Akkuzin
@@ -32,30 +29,34 @@ class PostNewsActivity : AppCompatActivityBase() {
         imageLoadError = getString(R.string.common_on_image_upload_error)
         errorOnPost = getString(R.string.post_news_error_on_post)
 
-        binding = ActivityPostNewsBinding.inflate(layoutInflater)
-        binding.postNewsButton.setOnClickListener { async { post() } }
-        binding.removeImageButton.visibility = View.GONE
-        binding.newsImage.visibility = View.GONE
-        binding.addImageButton.setOnClickListener { uploadImage() }
-        binding.removeImageButton.setOnClickListener { removeImage() }
-        binding.publicNewsSwitch.visibility = View.GONE
-        async { tryEnableSwitch() }
-
-        onImageUploaded = { uri ->
-            binding.newsImage.setImageURI(uri)
-            binding.addImageButton.visibility = View.GONE
-            binding.removeImageButton.visibility = View.VISIBLE
-            binding.newsImage.visibility = View.VISIBLE
+        binding = ActivityPostNewsBinding.inflate(layoutInflater).apply {
+            postNewsButton.setOnClickListener { async { post() } }
+            removeImageButton.visibility = View.GONE
+            newsImage.visibility = View.GONE
+            addImageButton.setOnClickListener { contract.launch("image/*") }
+            removeImageButton.setOnClickListener {
+                imageUri = null
+                newsImage.setImageURI(null)
+                addImageButton.visibility = View.VISIBLE
+                removeImageButton.visibility = View.GONE
+                newsImage.visibility = View.GONE
+            }
+            publicNewsSwitch.visibility = View.GONE
+            async { tryEnableSwitch() }
+            onImageUploaded = {
+                Glide.with(this@PostNewsActivity).load(it).into(newsImage)
+                addImageButton.visibility = View.GONE
+                removeImageButton.visibility = View.VISIBLE
+                newsImage.visibility = View.VISIBLE
+            }
+            setContentView(root)
         }
-
-        setContentView(binding.root)
     }
 
     private suspend fun tryEnableSwitch() {
         UserRepository.getMe().letIfSuccess {
             if (isSupport()) {
                 binding.publicNewsSwitch.visibility = View.VISIBLE
-
             }
         }
     }
@@ -71,31 +72,16 @@ class PostNewsActivity : AppCompatActivityBase() {
             warn(missingText)
             return
         }
+        val isPublic = binding.publicNewsSwitch.isChecked
         binding.newsImage.invalidate()
-        var imageDto: ImageDto? = null
-        if (binding.newsImage.drawable != null) {
-            val base64 = Base64Converter.convert(binding.newsImage.drawable.toBitmap())
-            if (base64.isFailure) {
-                warn(imageLoadError)
-                return
-            }
-            imageDto = ImageDto("image", "png", base64.value())
-        }
-        val newsBody = NewsBody(title, text, binding.publicNewsSwitch.isChecked, imageDto)
+        val image = imageUri?.toImageBytes()
         warn("Минуточку…")
-        if (!NewsRepository.postNews(newsBody)) {
+        if (!NewsRepository.postNews(title, text, isPublic, image)) {
             warn(errorOnPost)
             return
         }
         setResult(RESULT_OK)
         finish()
-    }
-
-    private fun removeImage() {
-        binding.newsImage.setImageURI(null)
-        binding.addImageButton.visibility = View.VISIBLE
-        binding.removeImageButton.visibility = View.GONE
-        binding.newsImage.visibility = View.GONE
     }
 
     companion object {

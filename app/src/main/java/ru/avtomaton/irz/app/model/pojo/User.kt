@@ -13,7 +13,7 @@ data class User(
     val patronymic: String,
     val fullName: String,
     val birthday: Date,
-    val image: Bitmap?,
+    val imageId: UUID?,
     val aboutMyself: String,
     val myDoings: String,
     val skills: String,

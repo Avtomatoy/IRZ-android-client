@@ -1,5 +1,6 @@
 package ru.avtomaton.irz.app.client.api
 
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 import ru.avtomaton.irz.app.constants.USERS
@@ -26,7 +27,8 @@ interface UsersApi {
     suspend fun getMe(): Response<UserDto>
 
     @PUT("$USERS/me/update_photo")
-    suspend fun updatePhoto(@Body imageDto: ImageDto): Response<Unit>
+    @Multipart
+    suspend fun updatePhoto(@Part image: MultipartBody.Part): Response<Unit>
 
     @PUT("$USERS/me/delete_photo")
     suspend fun deletePhoto(): Response<Unit>

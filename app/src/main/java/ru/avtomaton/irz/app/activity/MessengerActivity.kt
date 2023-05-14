@@ -27,8 +27,8 @@ class MessengerActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRe
             messengerButton.setOnClickListener { chatsFeed.scrollToPosition(0) }
             searchButton.setOnClickListener { onSearchClick() }
             profileButton.setOnClickListener { onProfileClick() }
+            setContentView(root)
         }
-        setContentView(binding.root)
     }
 
     override fun onResume() {

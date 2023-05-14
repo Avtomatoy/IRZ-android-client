@@ -1,6 +1,5 @@
 package ru.avtomaton.irz.app.model.pojo
 
-import android.graphics.Bitmap
 import java.util.*
 
 /**
@@ -9,7 +8,7 @@ import java.util.*
 data class Message(
     val id: UUID,
     val text: String,
-    val image: Bitmap?,
+    val imageId: UUID?,
     val date: Date,
     val senderId: UUID
 )

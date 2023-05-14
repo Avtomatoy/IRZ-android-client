@@ -1,16 +1,21 @@
 package ru.avtomaton.irz.app.activity.util
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import ru.avtomaton.irz.app.activity.AppCompatActivityBase
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.SearchUserBinding
 import ru.avtomaton.irz.app.model.pojo.UserShort
 
 /**
  * @author Anton Akkuzin
  */
-class SearchUsersAdapter(private val listener: Listener) :
+class SearchUsersAdapter(
+    private val context: AppCompatActivityBase,
+    private val listener: Listener
+) :
     RecyclerView.Adapter<SearchUsersAdapter.UserHolder>() {
 
     private val users: MutableList<UserShort> = mutableListOf()
@@ -32,7 +37,7 @@ class SearchUsersAdapter(private val listener: Listener) :
     fun updateUsers(users: List<UserShort>) {
         users.forEach {
             this.users.add(it)
-            notifyItemInserted(this.users.size -1)
+            notifyItemInserted(this.users.size - 1)
         }
     }
 
@@ -47,9 +52,10 @@ class SearchUsersAdapter(private val listener: Listener) :
 
         fun bindUser(user: UserShort) {
             this.user = user
-            @SuppressLint("SetTextI18n")
-            searchUserBinding.userName.text = user.fullName
-            user.image?.also { searchUserBinding.userImage.setImageBitmap(it) }
+            searchUserBinding.apply {
+                userName.text = user.fullName
+                user.imageId?.also { Glide.with(context).loadImageBy(it).into(userImage) }
+            }
         }
     }
 

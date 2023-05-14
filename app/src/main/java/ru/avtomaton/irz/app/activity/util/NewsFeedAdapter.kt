@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.R
 import ru.avtomaton.irz.app.activity.AppCompatActivityBase
 import ru.avtomaton.irz.app.activity.CurrentNewsItemActivity
 import ru.avtomaton.irz.app.activity.ProfileActivity
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.NewsItemBinding
 import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.model.repository.NewsRepository
@@ -91,26 +93,30 @@ class NewsFeedAdapter(
             liked = news.isLiked
             likesCount = news.likesCount
             setLikeLogo()
-            newsItem.likesCount.text = news.likesCount.toString()
-            newsItem.commentsCount.text = news.commentCount.toString()
-            newsItem.newsTitle.text = news.title
-            news.author.image?.also { newsItem.newsAuthorImage.setImageBitmap(it) }
-            val name = "${news.author.surname} ${news.author.firstName}"
-            newsItem.newsAuthorName.text = name
-            newsItem.newsDatetime.text = AppCompatActivityBase.dateFormat.format(news.dateTime)
-            newsItem.newsImage.setImageDrawable(null)
-            news.image?.also { newsItem.newsImage.setImageBitmap(it) }
-            newsItem.newsText.text = news.text
-            newsItem.deleteButton.visibility = View.GONE
-            if (!CredentialsManager.isAuthenticated()) {
-                newsItem.likes.visibility = View.GONE
-                return
-            }
-            newsItem.likes.setOnClickListener { context.async { like() } }
-            newsItem.newsAuthor.setOnClickListener { onProfileClick(news.author.id) }
-            if (news.canDelete) {
-                newsItem.deleteButton.visibility = View.VISIBLE
-                newsItem.deleteButton.setOnClickListener { context.async { onNewsDelete(news) } }
+
+            newsItem.apply {
+                likesCount.text = news.likesCount.toString()
+                commentsCount.text = news.commentCount.toString()
+                newsTitle.text = news.title
+                news.author.imageId?.also {
+                    Glide.with(context).loadImageBy(it).into(newsAuthorImage)
+                }
+                newsAuthorName.text = news.author.fullName
+                newsDatetime.text = AppCompatActivityBase.dateFormat.format(news.dateTime)
+                newsImage.setImageDrawable(null)
+                news.imageId?.also { Glide.with(context).loadImageBy(it).into(newsImage) }
+                newsText.text = news.text
+                deleteButton.visibility = View.GONE
+                if (!CredentialsManager.isAuthenticated()) {
+                    newsItem.likes.visibility = View.GONE
+                    return
+                }
+                likes.setOnClickListener { context.async { like() } }
+                newsAuthor.setOnClickListener { onProfileClick(news.author.id) }
+                if (news.canDelete) {
+                    deleteButton.visibility = View.VISIBLE
+                    deleteButton.setOnClickListener { context.async { onNewsDelete(news) } }
+                }
             }
         }
 
