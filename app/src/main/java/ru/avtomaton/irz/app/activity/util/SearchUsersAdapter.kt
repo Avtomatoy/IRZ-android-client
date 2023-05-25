@@ -54,7 +54,7 @@ class SearchUsersAdapter(
             this.user = user
             searchUserBinding.apply {
                 userName.text = user.fullName
-                user.imageId?.also { Glide.with(context).loadImageBy(it).into(userImage) }
+                user.imageId?.also { Glide.with(context).loadImageBy(it).centerCrop().into(userImage) }
             }
         }
     }

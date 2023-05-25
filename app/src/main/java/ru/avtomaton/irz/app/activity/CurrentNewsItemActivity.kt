@@ -34,6 +34,7 @@ class CurrentNewsItemActivity : AppCompatActivityBase() {
             news.author.imageId?.also {
                 Glide.with(this@CurrentNewsItemActivity)
                     .loadImageBy(it)
+                    .centerCrop()
                     .into(newsAuthorImage)
             }
             newsAuthorName.text = news.author.fullName

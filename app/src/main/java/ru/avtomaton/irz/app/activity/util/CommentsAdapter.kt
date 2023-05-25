@@ -81,7 +81,7 @@ class CommentsAdapter(
         fun bind(comment: Comment) {
             this.comment = comment
             binding.apply {
-                comment.user.imageId?.also { Glide.with(context).loadImageBy(it).into(image) }
+                comment.user.imageId?.also { Glide.with(context).loadImageBy(it).centerCrop().into(image) }
                 name.text = comment.user.fullName
                 if (!comment.canDelete) deleteButton.visibility = View.GONE
                 datetime.text = AppCompatActivityBase.dateFormat.format(comment.dateTime)

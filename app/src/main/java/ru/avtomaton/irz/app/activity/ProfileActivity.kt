@@ -139,7 +139,7 @@ open class ProfileActivity : NavbarAppCompatActivityBase() {
         profileMyDoingsText.text = currentUser.myDoings
         image.setImageBitmap(defaultImage)
         currentUser.imageId?.also {
-            Glide.with(this@ProfileActivity).loadImageBy(it).error(defaultImage).into(image)
+            Glide.with(this@ProfileActivity).loadImageBy(it).error(defaultImage).centerCrop() .into(image)
         }
         name.text = currentUser.firstName
         surname.text = currentUser.surname

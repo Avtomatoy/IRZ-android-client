@@ -80,7 +80,7 @@ class MessengerAdapter(
         fun bind(chat: Chat) {
             chatItem.apply {
                 val user = chat.recipient
-                user.imageId?.also { Glide.with(context).loadImageBy(it).into(userImage) }
+                user.imageId?.also { Glide.with(context).loadImageBy(it).centerCrop().into(userImage) }
                 userName.text = user.fullName
                 chat.lastMessage?.let {
                     val text = "${if (it.senderId == userId) "Вы: " else ""}${it.text}"

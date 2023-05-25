@@ -99,7 +99,7 @@ class NewsFeedAdapter(
                 commentsCount.text = news.commentCount.toString()
                 newsTitle.text = news.title
                 news.author.imageId?.also {
-                    Glide.with(context).loadImageBy(it).into(newsAuthorImage)
+                    Glide.with(context).loadImageBy(it).centerCrop().into(newsAuthorImage)
                 }
                 newsAuthorName.text = news.author.fullName
                 newsDatetime.text = AppCompatActivityBase.dateFormat.format(news.dateTime)

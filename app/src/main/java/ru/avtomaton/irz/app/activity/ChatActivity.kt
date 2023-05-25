@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.activity.util.ChatAdapter
+import ru.avtomaton.irz.app.activity.util.DoNothingBackPressedCallback
 import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.ActivityChatBinding
 import ru.avtomaton.irz.app.model.repository.UserRepository
@@ -28,7 +30,12 @@ class ChatActivity : AppCompatActivityBase() {
         val chatId = intent.getStringExtra(chatKey)!!.let { UUID.fromString(it) }
         val ownerId = intent.getStringExtra(ownerKey)!!.let { UUID.fromString(it) }
         val recipientId = intent.getStringExtra(recipientKey)!!.let { UUID.fromString(it) }
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                startActivity(MessengerActivity.open(this@ChatActivity))
+            }
 
+        })
         binding = ActivityChatBinding.inflate(layoutInflater).apply {
             async { bindRecipient(recipientId) }
             this@ChatActivity.adapter =
@@ -93,7 +100,7 @@ class ChatActivity : AppCompatActivityBase() {
     private suspend fun ActivityChatBinding.bindRecipient(recipientId: UUID) =
         UserRepository.getUser(recipientId).letIfSuccess {
             imageId?.also {
-                Glide.with(this@ChatActivity).loadImageBy(it).into(userImage)
+                Glide.with(this@ChatActivity).loadImageBy(it).centerCrop().into(userImage)
             }
             this@bindRecipient.userName.text = this.fullName
         }

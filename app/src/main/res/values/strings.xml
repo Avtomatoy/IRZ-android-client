@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IRZ Android-client</string>
+    <string name="app_name">ЕЦК ИРЗ</string>
     <string name="welcome_message">Добро пожаловать в ЕЦК ИРЗ!</string>
     <string name="auth_btn_await_message">Секундочку</string>
     <string name="auth_missing_email">Не забудьте указать почту!</string>
