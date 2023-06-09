@@ -4,13 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.activity.AppCompatActivityBase
 import ru.avtomaton.irz.app.activity.ProfileActivity
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.CommentItemBinding
 import ru.avtomaton.irz.app.model.pojo.Comment
 import ru.avtomaton.irz.app.model.pojo.CommentToSend
 import ru.avtomaton.irz.app.model.repository.NewsRepository
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -37,7 +39,6 @@ class CommentsAdapter(
 
     override fun onBindViewHolder(holder: CommentHolder, position: Int) {
         holder.bind(commentsList[position])
-        // holder. // ?
         context.async { onCommentsUpdate(position) }
     }
 
@@ -80,14 +81,11 @@ class CommentsAdapter(
         fun bind(comment: Comment) {
             this.comment = comment
             binding.apply {
-                comment.user.image?.let { image.setImageBitmap(it) }
+                comment.user.imageId?.also { Glide.with(context).loadImageBy(it).centerCrop().into(image) }
                 name.text = comment.user.fullName
-                if (!comment.canDelete) {
-                    deleteButton.visibility = View.GONE
-                }
+                if (!comment.canDelete) deleteButton.visibility = View.GONE
                 datetime.text = AppCompatActivityBase.dateFormat.format(comment.dateTime)
                 text.text = comment.text
-
                 deleteButton.setOnClickListener { context.async { delete() } }
                 name.setOnClickListener {
                     val intent = ProfileActivity.openProfile(context, comment.user.id)

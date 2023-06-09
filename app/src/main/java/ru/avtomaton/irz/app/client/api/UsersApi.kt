@@ -1,17 +1,13 @@
 package ru.avtomaton.irz.app.client.api
 
+import okhttp3.MultipartBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
-import retrofit2.http.Query
-import ru.avtomaton.irz.app.model.pojo.UserDto
+import retrofit2.http.*
 import ru.avtomaton.irz.app.constants.USERS
 import ru.avtomaton.irz.app.model.pojo.ImageDto
+import ru.avtomaton.irz.app.model.pojo.UserDto
 import ru.avtomaton.irz.app.model.pojo.UserInfo
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -31,7 +27,8 @@ interface UsersApi {
     suspend fun getMe(): Response<UserDto>
 
     @PUT("$USERS/me/update_photo")
-    suspend fun updatePhoto(@Body imageDto: ImageDto): Response<Unit>
+    @Multipart
+    suspend fun updatePhoto(@Part image: MultipartBody.Part): Response<Unit>
 
     @PUT("$USERS/me/delete_photo")
     suspend fun deletePhoto(): Response<Unit>

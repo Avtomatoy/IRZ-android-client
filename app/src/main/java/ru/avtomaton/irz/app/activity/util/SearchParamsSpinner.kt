@@ -6,9 +6,8 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import ru.avtomaton.irz.app.model.pojo.User
 import ru.avtomaton.irz.app.model.pojo.UserShort
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -20,29 +19,34 @@ object SearchParamsSpinner {
         positionsList: List<String>,
         builder: UserSearchParams.Builder
     ) {
-        val values = mutableListOf("").apply { addAll(positionsList) }
-        this.adapter = createAdapter(context, values)
-        onItemSelectedListener = createListener { position ->
-            builder.positionId = positionsMap[values[position]]
+        mutableListOf("").let {
+            it.addAll(positionsList)
+            this.adapter = createAdapter(context, it)
+            onItemSelectedListener = createListener { position ->
+                builder.positionId = positionsMap[it[position]]
+            }
         }
     }
 
     fun Spinner.rolesSpinner(roles: List<String>, builder: UserSearchParams.Builder) {
-        val values = mutableListOf("").apply { addAll(roles) }
-        this.adapter = createAdapter(context, values)
-        onItemSelectedListener = createListener { position ->
-            builder.role = if (position == 0) null else values[position]
+        mutableListOf("").let {
+            it.addAll(roles)
+            this.adapter = createAdapter(context, it)
+            onItemSelectedListener = createListener { position ->
+                builder.role = if (position == 0) null else it[position]
+            }
         }
     }
 
     fun Spinner.userSpinner(users: List<UserShort>, builder: NewsSearchParams.Builder) {
         val map = HashMap<String, UUID>()
         users.forEach { map[it.fullName] = it.id }
-        val values =
-            mutableListOf("").apply { addAll(users.sortedBy { it.fullName }.map { it.fullName }) }
-        this.adapter = createAdapter(context, values)
-        onItemSelectedListener = createListener { position ->
-            builder.authorId = map[values[position]]
+        mutableListOf("").let { list ->
+            list.addAll(users.sortedBy { it.fullName }.map { it.fullName })
+            this.adapter = createAdapter(context, list)
+            onItemSelectedListener = createListener { position ->
+                builder.authorId = map[list[position]]
+            }
         }
     }
 

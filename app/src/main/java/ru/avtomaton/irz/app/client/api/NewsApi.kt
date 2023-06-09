@@ -1,20 +1,16 @@
 package ru.avtomaton.irz.app.client.api
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
-import ru.avtomaton.irz.app.model.pojo.NewsBody
-import ru.avtomaton.irz.app.model.pojo.NewsDto
+import retrofit2.http.*
 import ru.avtomaton.irz.app.constants.NEWS
 import ru.avtomaton.irz.app.constants.NEWS_COMMENTS
 import ru.avtomaton.irz.app.model.pojo.CommentDto
 import ru.avtomaton.irz.app.model.pojo.CommentToSend
-import java.util.UUID
+import ru.avtomaton.irz.app.model.pojo.NewsDto
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -34,7 +30,13 @@ interface NewsApi {
     suspend fun getNewsFullText(@Path("id") id: UUID): Response<ResponseBody>
 
     @POST(NEWS)
-    suspend fun postNews(@Body newsBody: NewsBody): Response<Unit>
+    @Multipart
+    suspend fun postNewsV2(
+        @Part("Title") title: RequestBody,
+        @Part("Text") text: RequestBody,
+        @Part("IsPublic") isPublic: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): Response<Unit>
 
     @DELETE("$NEWS/{id}")
     suspend fun deleteNews(@Path("id") id: UUID): Response<Unit>

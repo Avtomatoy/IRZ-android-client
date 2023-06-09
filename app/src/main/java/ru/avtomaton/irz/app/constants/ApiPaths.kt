@@ -22,8 +22,4 @@ const val SUBSCRIPTIONS_UNSUBSCRIBE = "/api/subscriptions/unsubscribe"
 
 const val POSITIONS = "/api/positions"
 
-const val CHATS = "/api/chats"
-
-const val MESSAGES = "/api/messages"
-
 const val MESSENGER = "/api/messenger"

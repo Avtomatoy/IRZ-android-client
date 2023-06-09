@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IRZ Android-client</string>
+    <string name="app_name">ЕЦК ИРЗ</string>
     <string name="welcome_message">Добро пожаловать в ЕЦК ИРЗ!</string>
     <string name="auth_btn_await_message">Секундочку</string>
     <string name="auth_missing_email">Не забудьте указать почту!</string>
@@ -78,6 +78,7 @@
     <!--  search_activity  -->
 
     <!--  profile_activity  -->
+    <string name="profile_activity_name">Профиль</string>
     <string name="profile_activity_change_info_new_photo_button">Загрузить фото</string>
     <string name="profile_activity_change_info_delete_photo_button">Удалить фото</string>
     <string name="profile_activity_current_position">…</string>
@@ -109,5 +110,8 @@
     <!--  current_news_item_activity  -->
     <string name="current_news_item_acitivity_commentary_hint">Комментарий</string>
     <!--  current_news_item_activity  -->
+
+    <!--  post_news_activity  -->
+    <string name="post_news_activity_main_text_hint">Дорогие друзья, сегодня на нашем заводе произошло знаменательное событие, которое…</string>
 
 </resources>

@@ -8,6 +8,5 @@ interface NavbarListener {
     fun onNewsClick()
     fun onMessengerClick()
     fun onSearchClick()
-    fun onEventsClick()
     fun onProfileClick()
 }

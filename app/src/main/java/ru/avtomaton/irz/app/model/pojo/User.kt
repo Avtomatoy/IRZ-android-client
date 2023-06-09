@@ -13,7 +13,7 @@ data class User(
     val patronymic: String,
     val fullName: String,
     val birthday: Date,
-    val image: Bitmap?,
+    val imageId: UUID?,
     val aboutMyself: String,
     val myDoings: String,
     val skills: String,
@@ -28,9 +28,5 @@ data class User(
 ) {
     fun isSupport(): Boolean {
         return roles.contains("Support")
-    }
-
-    fun isCabinetsManager(): Boolean {
-        return roles.contains("CabinetsManager")
     }
 }

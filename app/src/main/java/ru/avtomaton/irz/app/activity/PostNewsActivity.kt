@@ -4,17 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import retrofit2.Response
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.R
-import ru.avtomaton.irz.app.client.IrzHttpClient
-import ru.avtomaton.irz.app.model.pojo.ImageDto
-import ru.avtomaton.irz.app.model.pojo.NewsBody
-import ru.avtomaton.irz.app.model.repository.UserRepository
 import ru.avtomaton.irz.app.databinding.ActivityPostNewsBinding
-import ru.avtomaton.irz.app.services.Base64Converter
+import ru.avtomaton.irz.app.model.repository.NewsRepository
+import ru.avtomaton.irz.app.model.repository.UserRepository
 
 /**
  * @author Anton Akkuzin
@@ -35,84 +29,59 @@ class PostNewsActivity : AppCompatActivityBase() {
         imageLoadError = getString(R.string.common_on_image_upload_error)
         errorOnPost = getString(R.string.post_news_error_on_post)
 
-        binding = ActivityPostNewsBinding.inflate(layoutInflater)
-        binding.postNewsButton.setOnClickListener { post() }
-        binding.removeImageButton.visibility = View.GONE
-        binding.newsImage.visibility = View.GONE
-        binding.addImageButton.setOnClickListener { uploadImage() }
-        binding.removeImageButton.setOnClickListener { removeImage() }
-        binding.publicNewsSwitch.visibility = View.GONE
-        tryEnableSwitch()
-
-        onImageUploaded = { uri ->
-            binding.newsImage.setImageURI(uri)
-            binding.addImageButton.visibility = View.GONE
-            binding.removeImageButton.visibility = View.VISIBLE
-            binding.newsImage.visibility = View.VISIBLE
+        binding = ActivityPostNewsBinding.inflate(layoutInflater).apply {
+            postNewsButton.setOnClickListener { async { post() } }
+            removeImageButton.visibility = View.GONE
+            newsImage.visibility = View.GONE
+            addImageButton.setOnClickListener { contract.launch("image/*") }
+            removeImageButton.setOnClickListener {
+                imageUri = null
+                newsImage.setImageURI(null)
+                addImageButton.visibility = View.VISIBLE
+                removeImageButton.visibility = View.GONE
+                newsImage.visibility = View.GONE
+            }
+            publicNewsSwitch.visibility = View.GONE
+            async { tryEnableSwitch() }
+            onImageUploaded = {
+                Glide.with(this@PostNewsActivity).load(it).into(newsImage)
+                addImageButton.visibility = View.GONE
+                removeImageButton.visibility = View.VISIBLE
+                newsImage.visibility = View.VISIBLE
+            }
+            setContentView(root)
         }
-
-        setContentView(binding.root)
     }
 
-    private fun tryEnableSwitch() {
-        this.lifecycleScope.launch {
-            val meResult = UserRepository.getMe()
-            if (meResult.isFailure) {
-                error()
-                return@launch
-            }
-            if (meResult.value().isSupport()) {
+    private suspend fun tryEnableSwitch() {
+        UserRepository.getMe().letIfSuccess {
+            if (isSupport()) {
                 binding.publicNewsSwitch.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun post() {
-        this.lifecycleScope.launch {
-            val title = binding.newsTitle.text.toString().trim()
-            if (title.isEmpty() || title.isBlank()) {
-                warn(missingHeader)
-                return@launch
-            }
-            val text = binding.newsText.text.toString().trim()
-            if (text.isEmpty() || text.isBlank()) {
-                warn(missingText)
-                return@launch
-            }
-            binding.newsImage.invalidate()
-            var imageDto: ImageDto? = null
-            if (binding.newsImage.drawable != null) {
-                val base64 = Base64Converter.convert(binding.newsImage.drawable.toBitmap())
-                if (base64.isFailure) {
-                    warn(imageLoadError)
-                    return@launch
-                }
-                imageDto = ImageDto("image", "png", base64.value())
-            }
-            val newsBody = NewsBody(title, text, binding.publicNewsSwitch.isChecked, imageDto)
-            val response: Response<Unit>
-            try {
-                response = IrzHttpClient.newsApi.postNews(newsBody)
-            } catch (ex: Throwable) {
-                ex.printStackTrace()
-                warn(errorOnPost)
-                return@launch
-            }
-            if (!response.isSuccessful) {
-                println(response.code())
-                warn(errorOnPost)
-                return@launch
-            }
-            setResult(RESULT_OK)
-            finish()
+    private suspend fun post() {
+        val title = binding.newsTitle.text.toString().trim()
+        if (title.isBlank()) {
+            warn(missingHeader)
+            return
         }
-    }
-
-    private fun removeImage() {
-        binding.newsImage.setImageURI(null)
-        binding.addImageButton.visibility = View.VISIBLE
-        binding.removeImageButton.visibility = View.GONE
-        binding.newsImage.visibility = View.GONE
+        val text = binding.newsText.text.toString().trim()
+        if (text.isBlank()) {
+            warn(missingText)
+            return
+        }
+        val isPublic = binding.publicNewsSwitch.isChecked
+        binding.newsImage.invalidate()
+        val image = imageUri?.toImageBytes()
+        warn("Минуточку…")
+        if (!NewsRepository.postNews(title, text, isPublic, image)) {
+            warn(errorOnPost)
+            return
+        }
+        setResult(RESULT_OK)
+        finish()
     }
 
     companion object {

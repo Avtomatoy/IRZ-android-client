@@ -1,90 +1,54 @@
 package ru.avtomaton.irz.app.model.repository
 
-import android.graphics.Bitmap
 import retrofit2.Response
 import ru.avtomaton.irz.app.activity.util.UserSearchParams
 import ru.avtomaton.irz.app.client.IrzHttpClient
 import ru.avtomaton.irz.app.model.OpResult
 import ru.avtomaton.irz.app.model.pojo.*
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
  */
-object UserRepository {
+object UserRepository : Repository() {
 
-    private const val threeDots = "…"
-    private var me: User? = null
-
-    suspend fun updatePhoto(imageDto: ImageDto): Boolean {
-        return try {
-            val response = IrzHttpClient.usersApi.updatePhoto(imageDto)
-            response.isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
+    suspend fun updatePhoto(image: ByteArray): Boolean {
+        return tryForSuccess {
+            IrzHttpClient.usersApi.updatePhoto(image.asMultipartBody("file")).isSuccessful
         }
     }
 
     suspend fun deletePhoto(): Boolean {
-        return try {
+        return tryForSuccess {
             IrzHttpClient.usersApi.deletePhoto().isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
         }
     }
 
     suspend fun updateInfo(userInfo: UserInfo): Boolean {
-        return try {
+        return tryForSuccess {
             IrzHttpClient.usersApi.updateInfo(userInfo).isSuccessful
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            false
         }
     }
 
     suspend fun getUsers(userSearchParams: UserSearchParams): OpResult<List<UserShort>> {
-        return try {
-            val response = IrzHttpClient.usersApi.getUsers(
+        return tryForResult {
+            IrzHttpClient.usersApi.getUsers(
                 userSearchParams.positionId,
                 userSearchParams.role,
                 userSearchParams.searchString,
                 userSearchParams.pageIndex,
                 userSearchParams.pageSize
-            )
-            if (!response.isSuccessful) {
-                return OpResult.Failure()
+            ).letIfSuccess {
+                this.body()!!.map { convert(it) }.toList()
             }
-            val list = response.body()!!.map {
-                UserShort(
-                    it.id,
-                    it.firstName,
-                    it.surname,
-                    it.patronymic.orEmpty(),
-                    "${it.surname} ${it.firstName}${if (it.patronymic == null) "" else " ${it.patronymic}"}",
-                    getImage(it.imageId)
-                )
-            }.toList()
-            OpResult.Success(list)
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            OpResult.Failure()
         }
     }
 
-    suspend fun getMe(fromCache: Boolean = false): OpResult<User> {
-        if (fromCache && me != null) {
-            return OpResult.Success(me!!)
-        }
-        val user = getAnyUser(
+    suspend fun getMe(): OpResult<User> {
+        return getAnyUser(
             { IrzHttpClient.usersApi.getMe() },
             { UserPositionsRepository.getMyPositions() }
         )
-        if (user.isOk) {
-            me = user.value()
-        }
-        return user
     }
 
     suspend fun getUser(id: UUID): OpResult<User> {
@@ -98,19 +62,12 @@ object UserRepository {
         userBlock: suspend () -> Response<UserDto>,
         positionsBlock: suspend () -> OpResult<List<Position>>
     ): OpResult<User> {
-        return try {
+        return tryForResult {
             val positionsResult = positionsBlock.invoke()
             if (positionsResult.isFailure) {
-                return OpResult.Failure()
+                return@tryForResult OpResult.Failure()
             }
-            val userResponse = userBlock.invoke()
-            if (!userResponse.isSuccessful) {
-                return OpResult.Failure()
-            }
-            OpResult.Success(convert(userResponse.body()!!, positionsResult.value()))
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            OpResult.Failure()
+            userBlock().letIfSuccess { convert(this.body()!!, positionsResult.value()) }
         }
     }
 
@@ -121,12 +78,12 @@ object UserRepository {
             dto.firstName,
             dto.surname,
             dto.patronymic.orEmpty(),
-            "${dto.surname} ${dto.firstName}${if (dto.patronymic == null) "" else " ${dto.patronymic}"}",
+            getFullName(dto),
             dto.birthday,
-            getImage(dto.imageId),
-            dto.aboutMyself ?: threeDots,
-            dto.myDoings ?: threeDots,
-            dto.skills ?: threeDots,
+            dto.imageId,
+            dto.aboutMyself.orDots(),
+            dto.myDoings.orDots(),
+            dto.skills.orDots(),
             dto.subscribersCount,
             dto.subscriptionsCount,
             dto.isSubscription,
@@ -138,21 +95,31 @@ object UserRepository {
         )
     }
 
+    private fun convert(dto: UserDto): UserShort {
+        return UserShort(
+            dto.id,
+            dto.firstName,
+            dto.surname,
+            dto.patronymic.orEmpty(),
+            getFullName(dto),
+            dto.imageId
+        )
+    }
+
+    private fun getFullName(dto: UserDto): String = listOf(
+        dto.surname, dto.firstName, dto.patronymic.orEmpty()
+    ).joinToString(separator = " ")
+
+    private fun String?.orDots(): String = this ?: "…"
+
     private suspend fun getMyId(): UUID? {
         return try {
-            val response = IrzHttpClient.usersApi.getMe()
-            if (response.isSuccessful) response.body()!!.id else null
+            IrzHttpClient.usersApi.getMe().let {
+                if (it.isSuccessful) it.body()!!.id else null
+            }
         } catch (ex: Throwable) {
             ex.printStackTrace()
             null
         }
-    }
-
-    private suspend fun getImage(imageId: UUID?): Bitmap? {
-        if (imageId == null) {
-            return null
-        }
-        val result = ImageRepository.getImage(imageId)
-        return if (result.isOk) result.value() else null
     }
 }

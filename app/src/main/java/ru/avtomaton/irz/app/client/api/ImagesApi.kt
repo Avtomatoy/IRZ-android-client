@@ -3,9 +3,9 @@ package ru.avtomaton.irz.app.client.api
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
-import ru.avtomaton.irz.app.model.pojo.ImageDto
 import ru.avtomaton.irz.app.constants.IMAGES
-import java.util.UUID
+import ru.avtomaton.irz.app.model.pojo.ImageDto
+import java.util.*
 
 /**
  * @author Anton Akkuzin

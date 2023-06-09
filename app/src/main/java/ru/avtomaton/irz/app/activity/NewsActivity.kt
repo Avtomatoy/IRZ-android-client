@@ -25,7 +25,7 @@ import ru.avtomaton.irz.app.services.CredentialsManager
  */
 class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefreshListener {
 
-    private val postRequestCode = 228
+    private val code = 101
 
     private lateinit var binding: ActivityNewsBinding
     private lateinit var authors: List<UserShort>
@@ -36,10 +36,7 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
         onBackPressedDispatcher.addCallback(DoNothingBackPressedCallback())
         if (CredentialsManager.isAuthenticated()) {
             async {
-                UserRepository.getUsers(
-                    UserSearchParams.Builder()
-                        .apply { pageSize = 100 }.build()
-                )
+                UserRepository.getUsers(UserSearchParams.Builder().apply { pageSize = 100 }.build())
                     .letIfSuccess { authors = this }
             }
         }
@@ -48,14 +45,12 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
             newsButton.setOnClickListener { onNewsClick() }
             messengerButton.setOnClickListener { onMessengerClick() }
             searchButton.setOnClickListener { onSearchClick() }
-            eventsButton.setOnClickListener { onEventsClick() }
             profileButton.setOnClickListener { onProfileClick() }
             newsActivityName.setOnClickListener { scrollToActivityTop() }
             searchParamsButton.setOnClickListener { searchDialog() }
             writeNewsButton.setOnClickListener {
-                @Suppress("DEPRECATION") startActivityForResult(
-                    PostNewsActivity.open(this@NewsActivity), postRequestCode
-                )
+                @Suppress("DEPRECATION")
+                startActivityForResult(PostNewsActivity.open(this@NewsActivity), code)
             }
             if (CredentialsManager.isAuthenticated()) {
                 return@apply
@@ -66,10 +61,8 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
             writeNewsButton.visibility = View.GONE
             messengerButton.backgroundTintList = color
             searchButton.backgroundTintList = color
-            eventsButton.backgroundTintList = color
             messengerButton.isClickable = false
             searchButton.isClickable = false
-            eventsButton.isClickable = false
         }
         setContentView(binding.root)
     }
@@ -80,7 +73,6 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
     }
 
     private fun scrollToActivityTop() {
-        binding.newsFeed
         binding.newsFeed.scrollToPosition(0)
     }
 
@@ -101,10 +93,10 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
             AlertDialog.Builder(this@NewsActivity).create().apply {
                 setView(root)
                 setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _, _ ->
-                    builder.publicOnly = isPublic.isChecked
-                    builder.likedOnly = isLiked.isChecked
-                    builder.searchString = searchInput.text.toString().let {
-                        it.ifBlank { null }
+                    builder.apply {
+                        publicOnly = isPublic.isChecked
+                        likedOnly = isLiked.isChecked
+                        searchString = searchInput.text.toString().ifBlank { null }
                     }
                     recreateAdapter()
                 }
@@ -127,8 +119,9 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
 
     @Suppress("OVERRIDE_DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        @Suppress("DEPRECATION") super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == postRequestCode) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == code) {
             recreateAdapter()
         }
     }
@@ -138,15 +131,17 @@ class NewsActivity : NavbarAppCompatActivityBase(), SwipeRefreshLayout.OnRefresh
     }
 
     override fun onProfileClick() {
-        val intent = if (CredentialsManager.isAuthenticated()) ProfileActivity.openMyProfile(this)
-        else AuthActivity.open(this)
+        val intent = if (CredentialsManager.isAuthenticated())
+            ProfileActivity.openMyProfile(this)
+        else
+            AuthActivity.open(this)
         startActivity(intent)
     }
 
     companion object {
+
         fun openNews(context: Context): Intent {
             return Intent(context, NewsActivity::class.java)
         }
-
     }
 }

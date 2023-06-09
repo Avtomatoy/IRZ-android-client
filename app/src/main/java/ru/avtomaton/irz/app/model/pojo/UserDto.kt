@@ -1,8 +1,7 @@
 package ru.avtomaton.irz.app.model.pojo
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin
@@ -23,5 +22,4 @@ data class UserDto(
     @SerializedName("email") val email: String,
     @SerializedName("isActiveAccount") val isActiveAccount: Boolean,
     @SerializedName("roles") val roles: List<String>,
-    // TODO: positions
 )

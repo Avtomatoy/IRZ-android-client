@@ -42,10 +42,10 @@
         android:paddingStart="5sp"
         android:paddingEnd="5sp"
         android:text="@string/news_name"
-        android:textAlignment="textStart"
         android:textColor="@color/Pantone_289_C"
-        android:textSize="35sp"
+        android:textSize="25sp"
         android:textStyle="bold"
+        android:gravity="center|start"
         app:drawableEndCompat="@drawable/irz_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -105,16 +105,6 @@
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
             android:contentDescription="@string/search_button_description" />
-        <ImageButton
-            android:id="@+id/events_button"
-            android:layout_width="wrap_content"
-            android:layout_weight=".20"
-            android:layout_height="match_parent"
-            android:src="@drawable/calendar_button"
-            android:backgroundTint="@color/Pantone_289_C"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/calendar_button_description" />
         <ImageButton
             android:id="@+id/profile_button"
             android:layout_width="wrap_content"

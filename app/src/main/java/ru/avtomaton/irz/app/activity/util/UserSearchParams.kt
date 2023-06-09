@@ -1,6 +1,6 @@
 package ru.avtomaton.irz.app.activity.util
 
-import java.util.UUID
+import java.util.*
 
 /**
  * @author Anton Akkuzin

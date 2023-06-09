@@ -3,15 +3,16 @@ package ru.avtomaton.irz.app.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import ru.avtomaton.irz.app.activity.util.CommentsAdapter
-import ru.avtomaton.irz.app.model.pojo.News
+import ru.avtomaton.irz.app.client.IrzHttpClient.loadImageBy
 import ru.avtomaton.irz.app.databinding.ActivityCurrentNewsItemBinding
 import ru.avtomaton.irz.app.model.pojo.CommentToSend
+import ru.avtomaton.irz.app.model.pojo.News
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.util.*
 
@@ -20,27 +21,9 @@ import java.util.*
  */
 class CurrentNewsItemActivity : AppCompatActivityBase() {
 
-    // todo: probably there's a better solution
-    // workaround to pass potentially big images to activity
-    companion object {
-        private const val key: String = "news_item"
-        var image: Bitmap? = null
-        var authorImage: Bitmap? = null
-
-        fun open(context: Context, news: News): Intent {
-            val intent = Intent(context, CurrentNewsItemActivity::class.java)
-            intent.putExtra(key, news)
-            image = news.image
-            authorImage = news.author.image
-
-            return intent
-        }
-    }
-
     private lateinit var binding: ActivityCurrentNewsItemBinding
     private lateinit var newsId: UUID
     private lateinit var adapter: CommentsAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         @Suppress("DEPRECATION")
@@ -48,40 +31,43 @@ class CurrentNewsItemActivity : AppCompatActivityBase() {
         newsId = news.id
         binding = ActivityCurrentNewsItemBinding.inflate(layoutInflater).apply {
             newsTitle.text = news.title
-            authorImage?.also { newsAuthorImage.setImageBitmap(it) }
-            val name = "${news.author.surname} ${news.author.firstName}"
-            newsAuthorName.text = name
+            news.author.imageId?.also {
+                Glide.with(this@CurrentNewsItemActivity)
+                    .loadImageBy(it)
+                    .centerCrop()
+                    .into(newsAuthorImage)
+            }
+            newsAuthorName.text = news.author.fullName
             newsDatetime.text = dateFormat.format(news.dateTime)
             newsImage.setImageDrawable(null)
-            image?.also { newsImage.setImageBitmap(it) }
+            news.imageId?.also {
+                Glide.with(this@CurrentNewsItemActivity)
+                    .loadImageBy(it)
+                    .into(newsImage)
+            }
             newsText.text = news.text
-            if (CredentialsManager.isAuthenticated()) {
-                newsAuthor.setOnClickListener {
-                    onProfileClick(news.author.id)
-                }
-            }
             postCommentButton.setOnClickListener { post() }
-        }
-        if (CredentialsManager.isAuthenticated()) {
-            adapter = CommentsAdapter(this, news.id)
-            binding.comments.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = this@CurrentNewsItemActivity.adapter
+            if (CredentialsManager.isAuthenticated()) {
+                newsAuthor.setOnClickListener { onProfileClick(news.author.id) }
             }
-        } else {
-            binding.apply {
+            if (CredentialsManager.isAuthenticated()) {
+                this@CurrentNewsItemActivity.adapter =
+                    CommentsAdapter(this@CurrentNewsItemActivity, news.id)
+                comments.apply {
+                    layoutManager = LinearLayoutManager(context)
+                    adapter = this@CurrentNewsItemActivity.adapter
+                }
+            } else apply {
                 commentsArea.visibility = View.GONE
                 comments.visibility = View.GONE
             }
+            setContentView(root)
         }
-        setContentView(binding.root)
     }
 
     private fun post() {
         val input = binding.input.text.toString()
-        if (input.isBlank()) {
-            return
-        }
+        if (input.isBlank()) return
         adapter.post(CommentToSend(newsId, input))
         binding.input.text = null
         val service = this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -90,5 +76,16 @@ class CurrentNewsItemActivity : AppCompatActivityBase() {
 
     private fun onProfileClick(id: UUID) {
         startActivity(ProfileActivity.openProfile(this, id))
+    }
+
+    companion object {
+
+        private const val key: String = "news_item"
+
+        fun open(context: Context, news: News): Intent {
+            val intent = Intent(context, CurrentNewsItemActivity::class.java)
+            intent.putExtra(key, news)
+            return intent
+        }
     }
 }

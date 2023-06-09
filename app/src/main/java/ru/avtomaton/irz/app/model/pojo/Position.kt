@@ -1,6 +1,6 @@
 package ru.avtomaton.irz.app.model.pojo
 
-import java.util.Date
+import java.util.*
 
 /**
  * @author Anton Akkuzin

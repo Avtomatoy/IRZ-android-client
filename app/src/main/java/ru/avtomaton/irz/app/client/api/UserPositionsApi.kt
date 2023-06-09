@@ -3,9 +3,9 @@ package ru.avtomaton.irz.app.client.api
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
-import ru.avtomaton.irz.app.model.pojo.PositionDto
 import ru.avtomaton.irz.app.constants.MY_POSITIONS
 import ru.avtomaton.irz.app.constants.USER_POSITIONS
+import ru.avtomaton.irz.app.model.pojo.PositionDto
 import java.util.*
 
 /**

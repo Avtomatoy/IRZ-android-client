@@ -1,5 +1,7 @@
 package ru.avtomaton.irz.app.client.api
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 import ru.avtomaton.irz.app.constants.MESSENGER
@@ -22,7 +24,16 @@ interface MessengerApi {
     ): Response<List<MessageDto>>
 
     @POST("$MESSENGER/messages")
-    suspend fun postMessage(@Body messageToSend: MessageToSend): Response<Unit>
+    @Deprecated("deprecated")
+    suspend fun postMessageV2(@Body messageToSend: MessageToSend): Response<Unit>
+
+    @POST("$MESSENGER/messages")
+    @Multipart
+    suspend fun postMessage(
+        @Part("UserId") userId: RequestBody,
+        @Part("Text") text: RequestBody?,
+        @Part image: MultipartBody.Part?,
+    ): Response<Unit>
 
     @DELETE("$MESSENGER/messages/{id}")
     suspend fun deleteMessage(@Path("id") id: UUID): Response<Unit>

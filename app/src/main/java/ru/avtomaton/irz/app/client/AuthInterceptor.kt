@@ -3,10 +3,10 @@ package ru.avtomaton.irz.app.client
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.Interceptor.Chain
-import ru.avtomaton.irz.app.model.pojo.JwtTokens
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_AUTHENTICATE
 import ru.avtomaton.irz.app.constants.AUTHENTICATION_REFRESH
 import ru.avtomaton.irz.app.constants.HTTP_UNAUTHORIZED
+import ru.avtomaton.irz.app.model.pojo.JwtTokens
 import ru.avtomaton.irz.app.services.CredentialsManager
 import java.net.URL
 

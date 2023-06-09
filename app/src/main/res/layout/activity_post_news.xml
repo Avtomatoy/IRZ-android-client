@@ -38,7 +38,7 @@
                         android:textColor="@color/Pantone_295_C"
                         android:textSize="24sp"
                         android:autofillHints=""
-                        android:inputType="text" />
+                        android:inputType="textCapSentences" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -73,9 +73,10 @@
                         android:id="@+id/news_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/news_text_placeholder"
+                        android:hint="@string/post_news_activity_main_text_hint"
                         android:textColor="@color/Pantone_289_C"
                         android:textSize="18sp"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:autofillHints="" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
